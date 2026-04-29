@@ -1,8 +1,8 @@
-use std::path::PathBuf;
+use engyls::config::{ConfigManager, DisplayArgs, parse_color_to_rgba};
 use gtk::prelude::*;
 use pango::FontDescription;
 use pangocairo::functions as pc;
-use engyls::config::{DisplayArgs, ConfigManager, parse_color_to_rgba};
+use std::path::PathBuf;
 
 fn main() -> anyhow::Result<()> {
     let (args, _) = ConfigManager::load_settings();
@@ -13,7 +13,7 @@ fn main() -> anyhow::Result<()> {
         .join("current_quote.txt");
 
     let raw_text = std::fs::read_to_string(cache_file).unwrap_or_default();
-    
+
     // Parse "quote" — Author
     let (quote_text, author_text) = if let Some((q, a)) = raw_text.rsplit_once(" — ") {
         (q.trim().trim_matches('"').to_string(), a.trim().to_string())
@@ -31,7 +31,7 @@ pub fn run_display(args: DisplayArgs, quote_text: &str, author_text: &str) {
     unsafe {
         std::env::set_var("GDK_BACKEND", "x11");
     }
-    
+
     gtk::init().expect("Failed to initialize GTK.");
 
     let window = gtk::Window::new(gtk::WindowType::Toplevel);
@@ -48,21 +48,57 @@ pub fn run_display(args: DisplayArgs, quote_text: &str, author_text: &str) {
     let visual = screen.rgba_visual().unwrap();
     window.set_visual(Some(&visual));
 
+    let (window_x, window_y, window_width, window_height) =
+        display_bounds(&args, !author_text.is_empty());
+
     let args_draw = args.clone();
     let q_text = quote_text.to_string();
     let a_text = author_text.to_string();
 
     window.connect_draw(move |_, cr| {
+        cr.translate(
+            (args_draw.appearance.quote_x - window_x) as f64,
+            (args_draw.appearance.quote_y - window_y) as f64,
+        );
         draw_quote(cr, &args_draw, &q_text, &a_text);
         false.into()
     });
 
+    window.set_default_size(window_width, window_height);
+    window.resize(window_width, window_height);
     window.show_all();
-    
-    // Move to fixed position
-    window.move_(args.appearance.quote_x, args.appearance.quote_y);
+
+    window.move_(window_x, window_y);
 
     gtk::main();
+}
+
+fn display_bounds(args: &DisplayArgs, has_author: bool) -> (i32, i32, i32, i32) {
+    let a = &args.appearance;
+    let padding = (a.stroke_width.ceil() as i32)
+        .max(a.shadow_offset.ceil() as i32)
+        .max(16);
+
+    let mut left = a.quote_x;
+    let mut top = a.quote_y;
+    let mut right = a.quote_x + a.quote_max_width;
+    let mut bottom = a.quote_y + a.quote_max_height;
+
+    if has_author {
+        let author_width = 360;
+        let author_height = ((a.font_size * 1.4).ceil() as i32).max(48);
+        left = left.min(a.author_x);
+        top = top.min(a.author_y);
+        right = right.max(a.author_x + author_width);
+        bottom = bottom.max(a.author_y + author_height);
+    }
+
+    left -= padding;
+    top -= padding;
+    right += padding * 2;
+    bottom += padding * 2;
+
+    (left, top, (right - left).max(1), (bottom - top).max(1))
 }
 
 fn draw_quote(cr: &cairo::Context, args: &DisplayArgs, quote: &str, author: &str) {
@@ -94,7 +130,7 @@ fn draw_quote(cr: &cairo::Context, args: &DisplayArgs, quote: &str, author: &str
         loop {
             let (_, logical) = iter.line_extents();
             let (ink, _) = iter.line_readonly().unwrap().extents();
-            
+
             let lw = (ink.width() as f64) / pango::SCALE as f64;
             let lh = (logical.height() as f64) / pango::SCALE as f64;
             let ly = (logical.y() as f64) / pango::SCALE as f64;
@@ -108,17 +144,43 @@ fn draw_quote(cr: &cairo::Context, args: &DisplayArgs, quote: &str, author: &str
             // Clip backgrounds to container height if text is long
             if ly + lh * 0.8 < (a.quote_max_height as f64) {
                 cr.new_sub_path();
-                cr.arc(bx + bw - radius, by + radius, radius, -std::f64::consts::FRAC_PI_2, 0.0);
-                cr.arc(bx + bw - radius, by + bh - radius, radius, 0.0, std::f64::consts::FRAC_PI_2);
-                cr.arc(bx + radius, by + bh - radius, radius, std::f64::consts::FRAC_PI_2, std::f64::consts::PI);
-                cr.arc(bx + radius, by + radius, radius, std::f64::consts::PI, -std::f64::consts::FRAC_PI_2);
+                cr.arc(
+                    bx + bw - radius,
+                    by + radius,
+                    radius,
+                    -std::f64::consts::FRAC_PI_2,
+                    0.0,
+                );
+                cr.arc(
+                    bx + bw - radius,
+                    by + bh - radius,
+                    radius,
+                    0.0,
+                    std::f64::consts::FRAC_PI_2,
+                );
+                cr.arc(
+                    bx + radius,
+                    by + bh - radius,
+                    radius,
+                    std::f64::consts::FRAC_PI_2,
+                    std::f64::consts::PI,
+                );
+                cr.arc(
+                    bx + radius,
+                    by + radius,
+                    radius,
+                    std::f64::consts::PI,
+                    -std::f64::consts::FRAC_PI_2,
+                );
                 cr.close_path();
                 cr.fill().unwrap();
             }
 
-            if !iter.next_line() { break; }
+            if !iter.next_line() {
+                break;
+            }
         }
-        
+
         cr.pop_group_to_source().unwrap();
         cr.paint_with_alpha(bg_a as f64).unwrap();
         cr.restore().unwrap();
@@ -175,7 +237,7 @@ fn draw_quote(cr: &cairo::Context, args: &DisplayArgs, quote: &str, author: &str
             loop {
                 let (_, logical) = iter.line_extents();
                 let (ink, _) = iter.line_readonly().unwrap().extents();
-                
+
                 let lx = (logical.x() as f64) / pango::SCALE as f64;
                 let ly = (logical.y() as f64) / pango::SCALE as f64;
                 let lw = (ink.width() as f64) / pango::SCALE as f64;
@@ -187,16 +249,42 @@ fn draw_quote(cr: &cairo::Context, args: &DisplayArgs, quote: &str, author: &str
                 let bh = lh + padding_v * 2.0;
 
                 cr.new_sub_path();
-                cr.arc(bx + bw - radius, by + radius, radius, -std::f64::consts::FRAC_PI_2, 0.0);
-                cr.arc(bx + bw - radius, by + bh - radius, radius, 0.0, std::f64::consts::FRAC_PI_2);
-                cr.arc(bx + radius, by + bh - radius, radius, std::f64::consts::FRAC_PI_2, std::f64::consts::PI);
-                cr.arc(bx + radius, by + radius, radius, std::f64::consts::PI, -std::f64::consts::FRAC_PI_2);
+                cr.arc(
+                    bx + bw - radius,
+                    by + radius,
+                    radius,
+                    -std::f64::consts::FRAC_PI_2,
+                    0.0,
+                );
+                cr.arc(
+                    bx + bw - radius,
+                    by + bh - radius,
+                    radius,
+                    0.0,
+                    std::f64::consts::FRAC_PI_2,
+                );
+                cr.arc(
+                    bx + radius,
+                    by + bh - radius,
+                    radius,
+                    std::f64::consts::FRAC_PI_2,
+                    std::f64::consts::PI,
+                );
+                cr.arc(
+                    bx + radius,
+                    by + radius,
+                    radius,
+                    std::f64::consts::PI,
+                    -std::f64::consts::FRAC_PI_2,
+                );
                 cr.close_path();
                 cr.fill().unwrap();
 
-                if !iter.next_line() { break; }
+                if !iter.next_line() {
+                    break;
+                }
             }
-            
+
             cr.pop_group_to_source().unwrap();
             cr.paint_with_alpha(a_val as f64).unwrap();
             cr.restore().unwrap();

@@ -16,9 +16,11 @@ pub fn parse_color_to_rgba(hex: &str) -> (f64, f64, f64, f64) {
 }
 
 pub fn rgba_to_hex(r: f64, g: f64, b: f64, a: f64) -> String {
-    format!("#{:02x}{:02x}{:02x}{:02x}", 
-        (r * 255.0) as u8, 
-        (g * 255.0) as u8, 
+    format!(
+        "#{:02x}{:02x}{:02x}{:02x}",
+        (r * 255.0) as u8,
+        (g * 255.0) as u8,
         (b * 255.0) as u8,
-        (a * 255.0) as u8)
+        (a * 255.0) as u8
+    )
 }

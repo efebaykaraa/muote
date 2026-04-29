@@ -1,7 +1,7 @@
-use std::path::PathBuf;
-use serde::{Deserialize, Serialize};
-use sha1::{Sha1, Digest};
 use crate::config::types::{AuthorsConfig, DisplayArgs};
+use serde::{Deserialize, Serialize};
+use sha1::{Digest, Sha1};
+use std::path::PathBuf;
 
 pub struct ConfigManager;
 
@@ -24,7 +24,7 @@ impl ConfigManager {
         if let Ok(contents) = std::fs::read_to_string(path) {
             let mut json_part = String::new();
             let mut file_hash = String::new();
-            
+
             for line in contents.lines() {
                 if line.starts_with("hash:") {
                     file_hash = line["hash:".len()..].to_string();
@@ -33,7 +33,7 @@ impl ConfigManager {
                     json_part.push('\n');
                 }
             }
-            
+
             if let Ok(data) = serde_json::from_str(&json_part) {
                 return (data, file_hash);
             }
@@ -46,14 +46,14 @@ impl ConfigManager {
             let _ = std::fs::create_dir_all(parent);
         }
         let json_str = serde_json::to_string_pretty(data)?;
-        
+
         let mut hasher = Sha1::new();
         hasher.update(json_str.as_bytes());
         let new_hash = format!("{:x}", hasher.finalize());
-        
+
         let final_content = format!("{}\nhash:{}", json_str, new_hash);
         std::fs::write(path, final_content)?;
-        
+
         Ok(new_hash)
     }
 

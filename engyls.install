@@ -1,0 +1,43 @@
+post_install() {
+  systemctl --global enable engyls-quote.service >/dev/null 2>&1 || true
+  systemctl --global enable marxist-quote-fetch.timer >/dev/null 2>&1 || true
+  _engyls_restart_user_units
+}
+
+post_upgrade() {
+  systemctl --global enable engyls-quote.service >/dev/null 2>&1 || true
+  systemctl --global enable marxist-quote-fetch.timer >/dev/null 2>&1 || true
+  _engyls_restart_user_units
+}
+
+post_remove() {
+  systemctl --global disable engyls-quote.service >/dev/null 2>&1 || true
+  systemctl --global disable marxist-quote-fetch.timer >/dev/null 2>&1 || true
+  _engyls_reload_user_managers
+}
+
+_engyls_reload_user_managers() {
+  while read -r uid user; do
+    [ -n "$uid" ] || continue
+    [ -n "$user" ] || continue
+    runuser -u "$user" -- env XDG_RUNTIME_DIR="/run/user/$uid" \
+      systemctl --user daemon-reload >/dev/null 2>&1 || true
+  done <<EOF
+$(loginctl list-users --no-legend 2>/dev/null)
+EOF
+}
+
+_engyls_restart_user_units() {
+  while read -r uid user; do
+    [ -n "$uid" ] || continue
+    [ -n "$user" ] || continue
+    runuser -u "$user" -- env XDG_RUNTIME_DIR="/run/user/$uid" \
+      systemctl --user daemon-reload >/dev/null 2>&1 || true
+    runuser -u "$user" -- env XDG_RUNTIME_DIR="/run/user/$uid" \
+      systemctl --user restart engyls-quote.service >/dev/null 2>&1 || true
+    runuser -u "$user" -- env XDG_RUNTIME_DIR="/run/user/$uid" \
+      systemctl --user restart marxist-quote-fetch.timer >/dev/null 2>&1 || true
+  done <<EOF
+$(loginctl list-users --no-legend 2>/dev/null)
+EOF
+}

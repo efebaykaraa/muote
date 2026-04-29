@@ -1,5 +1,4 @@
-
-use crate::events::{HoverTarget, DragMode};
+use crate::events::{DragMode, HoverTarget};
 
 pub struct State {
     pub args: engyls::config::DisplayArgs,

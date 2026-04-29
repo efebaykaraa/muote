@@ -1,8 +1,8 @@
-use crate::state::{State, PREVIEW_AUTHOR};
+use crate::events::HoverTarget;
+use crate::state::{PREVIEW_AUTHOR, State};
 use engyls::config::parse_color_to_rgba;
 use pango::FontDescription;
 use pangocairo::functions as pc;
-use crate::events::HoverTarget;
 
 pub fn draw_author(cr: &cairo::Context, s: &mut State) {
     let a = &s.args.appearance;
@@ -22,7 +22,10 @@ pub fn draw_author(cr: &cairo::Context, s: &mut State) {
         cr.set_dash(&[], 0.0);
     }
 
-    if is_dragging_a { cr.save().unwrap(); cr.push_group(); }
+    if is_dragging_a {
+        cr.save().unwrap();
+        cr.push_group();
+    }
 
     let author_layout = pc::create_layout(cr);
     let mut afont = FontDescription::new();
@@ -45,7 +48,7 @@ pub fn draw_author(cr: &cairo::Context, s: &mut State) {
         loop {
             let (_, logical) = iter.line_extents();
             let (ink, _) = iter.line_readonly().unwrap().extents();
-            
+
             let lx = (logical.x() as f64) / pango::SCALE as f64;
             let ly = (logical.y() as f64) / pango::SCALE as f64;
             let lw = (ink.width() as f64) / pango::SCALE as f64;
@@ -57,16 +60,42 @@ pub fn draw_author(cr: &cairo::Context, s: &mut State) {
             let bh = lh + padding_v * 2.0;
 
             cr.new_sub_path();
-            cr.arc(bx + bw - radius, by + radius, radius, -std::f64::consts::FRAC_PI_2, 0.0);
-            cr.arc(bx + bw - radius, by + bh - radius, radius, 0.0, std::f64::consts::FRAC_PI_2);
-            cr.arc(bx + radius, by + bh - radius, radius, std::f64::consts::FRAC_PI_2, std::f64::consts::PI);
-            cr.arc(bx + radius, by + radius, radius, std::f64::consts::PI, -std::f64::consts::FRAC_PI_2);
+            cr.arc(
+                bx + bw - radius,
+                by + radius,
+                radius,
+                -std::f64::consts::FRAC_PI_2,
+                0.0,
+            );
+            cr.arc(
+                bx + bw - radius,
+                by + bh - radius,
+                radius,
+                0.0,
+                std::f64::consts::FRAC_PI_2,
+            );
+            cr.arc(
+                bx + radius,
+                by + bh - radius,
+                radius,
+                std::f64::consts::FRAC_PI_2,
+                std::f64::consts::PI,
+            );
+            cr.arc(
+                bx + radius,
+                by + radius,
+                radius,
+                std::f64::consts::PI,
+                -std::f64::consts::FRAC_PI_2,
+            );
             cr.close_path();
             cr.fill().unwrap();
 
-            if !iter.next_line() { break; }
+            if !iter.next_line() {
+                break;
+            }
         }
-        
+
         cr.pop_group_to_source().unwrap();
         cr.paint_with_alpha(ba as f64).unwrap();
         cr.restore().unwrap();

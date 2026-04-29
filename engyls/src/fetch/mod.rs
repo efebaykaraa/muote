@@ -2,16 +2,16 @@ pub mod pool;
 pub mod wikiquote;
 
 use crate::config::ConfigManager;
+pub use pool::QuotePool;
 use rand::Rng;
 use std::path::PathBuf;
-pub use pool::QuotePool;
 pub use wikiquote::fetch_wikiquote;
 
 /// Fetch a random quote from WikiQuote for a weighted-random author and save it to the cache.
 pub fn fetch_quote() -> anyhow::Result<()> {
     let (authors_cfg, _) = ConfigManager::load_authors();
     let (mut settings_cfg, _) = ConfigManager::load_settings();
-    
+
     let authors = authors_cfg.authors;
     let total_weight: u32 = authors.iter().map(|a| a.weight).sum();
     if total_weight == 0 {
@@ -20,7 +20,10 @@ pub fn fetch_quote() -> anyhow::Result<()> {
 
     let mut rng = rand::rng();
     let mut chosen_weight = rng.random_range(0..total_weight);
-    let mut selected_author = authors.first().map(|a| a.name.as_str()).unwrap_or("Karl Marx");
+    let mut selected_author = authors
+        .first()
+        .map(|a| a.name.as_str())
+        .unwrap_or("Karl Marx");
 
     for author in &authors {
         if chosen_weight < author.weight {
@@ -33,7 +36,10 @@ pub fn fetch_quote() -> anyhow::Result<()> {
     let current_hash = settings_cfg.calculate_position_hash();
     let max_chars = settings_cfg.appearance.max_quote_chars;
 
-    println!("Picking quote for {} (max chars: {}, hash: {})", selected_author, max_chars, current_hash);
+    println!(
+        "Picking quote for {} (max chars: {}, hash: {})",
+        selected_author, max_chars, current_hash
+    );
 
     let mut pool = QuotePool::load(selected_author).unwrap_or_else(|| QuotePool {
         position_hash: String::new(),
@@ -55,18 +61,24 @@ pub fn fetch_quote() -> anyhow::Result<()> {
     while !pool.quotes.is_empty() {
         let idx = rng.random_range(0..pool.quotes.len());
         let q = pool.quotes[idx].clone();
-        
+
         if q.chars().count() <= max_chars {
             chosen_quote = q;
             break;
         } else {
-            println!("Quote too long ({} chars), removing from pool.", q.chars().count());
+            println!(
+                "Quote too long ({} chars), removing from pool.",
+                q.chars().count()
+            );
             pool.quotes.remove(idx);
         }
     }
 
     if chosen_quote.is_empty() {
-        anyhow::bail!("No fitting quotes found for {} in current pool. Try resizing or wait for next fetch.", selected_author);
+        anyhow::bail!(
+            "No fitting quotes found for {} in current pool. Try resizing or wait for next fetch.",
+            selected_author
+        );
     }
 
     let _ = pool.save(selected_author);

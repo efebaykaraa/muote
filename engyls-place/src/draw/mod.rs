@@ -1,6 +1,6 @@
-pub mod quote;
 pub mod author;
 pub mod guides;
+pub mod quote;
 
 use crate::state::State;
 use pango::FontDescription;

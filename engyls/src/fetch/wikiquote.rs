@@ -39,7 +39,10 @@ pub fn fetch_wikiquote(author: &str) -> anyhow::Result<Vec<String>> {
     }
 
     if quote_section_indices.is_empty() {
-        if let Some(quotes_section) = sections.iter().find(|s| s["line"].as_str() == Some("Quotes")) {
+        if let Some(quotes_section) = sections
+            .iter()
+            .find(|s| s["line"].as_str() == Some("Quotes"))
+        {
             if let Some(idx) = quotes_section["index"].as_str() {
                 quote_section_indices.push(idx.to_string());
             }
@@ -81,7 +84,9 @@ pub fn fetch_wikiquote(author: &str) -> anyhow::Result<Vec<String>> {
         let extracted = extract_quotes_from_html(html_str);
         all_quotes.extend(extracted);
 
-        if all_quotes.len() >= 200 { break; }
+        if all_quotes.len() >= 200 {
+            break;
+        }
     }
 
     Ok(all_quotes)
@@ -114,11 +119,19 @@ fn extract_direct_text(element: &scraper::ElementRef) -> String {
             }
             scraper::node::Node::Element(el) => {
                 let tag = el.name();
-                if tag == "ul" || tag == "dl" || tag == "span" && el.attr("class").map_or(false, |c| c.contains("editsection")) {
+                if tag == "ul"
+                    || tag == "dl"
+                    || tag == "span"
+                        && el
+                            .attr("class")
+                            .map_or(false, |c| c.contains("editsection"))
+                {
                     continue;
                 }
                 if let Some(child_ref) = scraper::ElementRef::wrap(child) {
-                    if tag == "sup" { continue; }
+                    if tag == "sup" {
+                        continue;
+                    }
                     text.push_str(&extract_direct_text(&child_ref));
                 }
             }
@@ -131,22 +144,43 @@ fn extract_direct_text(element: &scraper::ElementRef) -> String {
 fn clean_quote(text: &str) -> String {
     let mut s = text.trim().to_string();
     for mark in &['"', '“', '”', '«', '»', '\u{201C}', '\u{201D}'] {
-        if s.starts_with(*mark) { s = s.trim_start_matches(*mark).to_string(); }
-        if s.ends_with(*mark) { s = s.trim_end_matches(*mark).to_string(); }
+        if s.starts_with(*mark) {
+            s = s.trim_start_matches(*mark).to_string();
+        }
+        if s.ends_with(*mark) {
+            s = s.trim_end_matches(*mark).to_string();
+        }
     }
-    s.split_whitespace().collect::<Vec<_>>().join(" ").trim().to_string()
+    s.split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+        .trim()
+        .to_string()
 }
 
 fn is_attribution(text: &str) -> bool {
     let lower = text.to_lowercase();
     let prefixes = [
-        "as quoted in", "letter from", "letter to", "quoted in", "source:",
-        "variant:", "see also", "compare:", "attributed", "paraphrase",
-        "often misquoted", "sometimes attributed", "this is often",
+        "as quoted in",
+        "letter from",
+        "letter to",
+        "quoted in",
+        "source:",
+        "variant:",
+        "see also",
+        "compare:",
+        "attributed",
+        "paraphrase",
+        "often misquoted",
+        "sometimes attributed",
+        "this is often",
     ];
     prefixes.iter().any(|p| lower.starts_with(p))
 }
 
 fn urlencoded(s: &str) -> String {
-    s.replace(' ', "%20").replace('&', "%26").replace('?', "%3F").replace('#', "%23")
+    s.replace(' ', "%20")
+        .replace('&', "%26")
+        .replace('?', "%3F")
+        .replace('#', "%23")
 }

@@ -1,16 +1,16 @@
 use adw::prelude::*;
-use gtk::{glib, Application};
+use gtk::{Application, glib};
 use std::cell::RefCell;
 use std::rc::Rc;
 
-mod state;
 mod draw;
 mod events;
+mod state;
 
-use state::State;
 use draw::draw_scene;
-use events::{hit_test, snap_to_line, HoverTarget, DragMode};
 use engyls::config::ConfigManager;
+use events::{DragMode, HoverTarget, hit_test, snap_to_line};
+use state::State;
 
 fn main() -> glib::ExitCode {
     let app = Application::builder()
@@ -27,7 +27,12 @@ fn main() -> glib::ExitCode {
 
 fn build_ui(app: &Application) {
     let args_os: Vec<String> = std::env::args().collect();
-    let args = if args_os.len() > 1 {
+    let args = if let Ok(json) = std::env::var("ENGYLS_PLACE_ARGS") {
+        match serde_json::from_str::<engyls::config::DisplayArgs>(&json) {
+            Ok(a) => a,
+            Err(_) => ConfigManager::load_settings().0,
+        }
+    } else if args_os.len() > 1 {
         match serde_json::from_str::<engyls::config::DisplayArgs>(&args_os[1]) {
             Ok(a) => a,
             Err(_) => ConfigManager::load_settings().0,
@@ -37,7 +42,11 @@ fn build_ui(app: &Application) {
     };
 
     let (sw, sh) = if let Some(display) = gtk::gdk::Display::default() {
-        if let Some(monitor) = display.monitors().item(0).and_then(|m| m.downcast::<gtk::gdk::Monitor>().ok()) {
+        if let Some(monitor) = display
+            .monitors()
+            .item(0)
+            .and_then(|m| m.downcast::<gtk::gdk::Monitor>().ok())
+        {
             let geometry = monitor.geometry();
             (geometry.width() as f64, geometry.height() as f64)
         } else {
@@ -99,7 +108,9 @@ fn build_ui(app: &Application) {
     let da_motion = drawing_area.clone();
     motion.connect_motion(move |_, x, y| {
         let mut s = state_motion.borrow_mut();
-        if s.drag_mode != DragMode::None { return; }
+        if s.drag_mode != DragMode::None {
+            return;
+        }
         s.hover = hit_test(&s, x, y);
         da_motion.queue_draw();
 
@@ -152,7 +163,8 @@ fn build_ui(app: &Application) {
         match s.drag_mode {
             DragMode::MoveQuote => {
                 let raw_x = s.drag_start_val_x + ox as i32;
-                s.args.appearance.quote_x = crate::events::snap_x(raw_x, s.args.appearance.quote_max_width, s.screen_width);
+                s.args.appearance.quote_x =
+                    crate::events::snap_x(raw_x, s.args.appearance.quote_max_width, s.screen_width);
                 s.args.appearance.quote_y = s.drag_start_val_y + oy as i32;
             }
             DragMode::MoveAuthor => {
@@ -165,7 +177,8 @@ fn build_ui(app: &Application) {
             }
             DragMode::ResizeHeight => {
                 let raw = (s.drag_start_height + oy as i32).max(s.line_height);
-                s.args.appearance.quote_max_height = snap_to_line(raw, s.line_height).max(s.line_height);
+                s.args.appearance.quote_max_height =
+                    snap_to_line(raw, s.line_height).max(s.line_height);
             }
             DragMode::None => {}
         }
@@ -217,7 +230,9 @@ fn build_ui(app: &Application) {
     overlay.add_overlay(&button_box);
 
     let win_cancel = window.clone();
-    cancel_btn.connect_clicked(move |_| { win_cancel.close(); });
+    cancel_btn.connect_clicked(move |_| {
+        win_cancel.close();
+    });
 
     let state_save = state.clone();
     let win_save = window.clone();
@@ -228,10 +243,12 @@ fn build_ui(app: &Application) {
 
         // Save
         let _ = ConfigManager::save_settings(&s.args);
-        println!("Saved. Container {}×{}, max_quote_chars={}",
+        println!(
+            "Saved. Container {}×{}, max_quote_chars={}",
             s.args.appearance.quote_max_width,
             s.args.appearance.quote_max_height,
-            s.args.appearance.max_quote_chars);
+            s.args.appearance.max_quote_chars
+        );
         win_save.close();
     });
 

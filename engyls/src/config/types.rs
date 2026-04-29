@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use sha1::{Sha1, Digest};
+use sha1::{Digest, Sha1};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Appearance {
@@ -28,9 +28,15 @@ pub struct Appearance {
     pub position_hash: String,
 }
 
-fn default_quote_max_width() -> i32 { 800 }
-fn default_quote_max_height() -> i32 { 300 }
-fn default_max_quote_chars() -> usize { 500 }
+fn default_quote_max_width() -> i32 {
+    800
+}
+fn default_quote_max_height() -> i32 {
+    300
+}
+fn default_max_quote_chars() -> usize {
+    500
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DisplayArgs {
@@ -68,7 +74,8 @@ impl Default for DisplayArgs {
 impl DisplayArgs {
     pub fn calculate_position_hash(&self) -> String {
         let mut hasher = Sha1::new();
-        let data = format!("{}:{}:{}:{}", 
+        let data = format!(
+            "{}:{}:{}:{}",
             self.appearance.font,
             self.appearance.font_size,
             self.appearance.quote_max_width,
@@ -94,9 +101,18 @@ impl Default for AuthorsConfig {
     fn default() -> Self {
         Self {
             authors: vec![
-                Author { name: "Karl Marx".into(), weight: 3 },
-                Author { name: "Friedrich Engels".into(), weight: 2 },
-                Author { name: "Vladimir Lenin".into(), weight: 2 },
+                Author {
+                    name: "Karl Marx".into(),
+                    weight: 3,
+                },
+                Author {
+                    name: "Friedrich Engels".into(),
+                    weight: 2,
+                },
+                Author {
+                    name: "Vladimir Lenin".into(),
+                    weight: 2,
+                },
             ],
         }
     }

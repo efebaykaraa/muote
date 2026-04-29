@@ -1,4 +1,4 @@
-use crate::state::{State, PREVIEW_QUOTE};
+use crate::state::{PREVIEW_QUOTE, State};
 use engyls::config::parse_color_to_rgba;
 use pango::FontDescription;
 use pangocairo::functions as pc;
@@ -20,7 +20,7 @@ pub fn draw_quote(cr: &cairo::Context, s: &mut State) {
         let padding_h = 12.0;
         let padding_v = 6.0;
         let radius = 8.0;
-        
+
         cr.save().unwrap();
         cr.push_group();
         cr.set_source_rgba(bg_r, bg_g, bg_b, 1.0);
@@ -39,7 +39,7 @@ pub fn draw_quote(cr: &cairo::Context, s: &mut State) {
         loop {
             let (_, logical) = iter.line_extents();
             let (ink, _) = iter.line_readonly().unwrap().extents();
-            
+
             let lw = (ink.width() as f64) / pango::SCALE as f64;
             let lh = (logical.height() as f64) / pango::SCALE as f64;
             let ly = (logical.y() as f64) / pango::SCALE as f64;
@@ -53,17 +53,43 @@ pub fn draw_quote(cr: &cairo::Context, s: &mut State) {
             // Only draw if the line is mostly visible
             if ly + lh * 0.8 < qh {
                 cr.new_sub_path();
-                cr.arc(bx + bw - radius, by + radius, radius, -std::f64::consts::FRAC_PI_2, 0.0);
-                cr.arc(bx + bw - radius, by + bh - radius, radius, 0.0, std::f64::consts::FRAC_PI_2);
-                cr.arc(bx + radius, by + bh - radius, radius, std::f64::consts::FRAC_PI_2, std::f64::consts::PI);
-                cr.arc(bx + radius, by + radius, radius, std::f64::consts::PI, -std::f64::consts::FRAC_PI_2);
+                cr.arc(
+                    bx + bw - radius,
+                    by + radius,
+                    radius,
+                    -std::f64::consts::FRAC_PI_2,
+                    0.0,
+                );
+                cr.arc(
+                    bx + bw - radius,
+                    by + bh - radius,
+                    radius,
+                    0.0,
+                    std::f64::consts::FRAC_PI_2,
+                );
+                cr.arc(
+                    bx + radius,
+                    by + bh - radius,
+                    radius,
+                    std::f64::consts::FRAC_PI_2,
+                    std::f64::consts::PI,
+                );
+                cr.arc(
+                    bx + radius,
+                    by + radius,
+                    radius,
+                    std::f64::consts::PI,
+                    -std::f64::consts::FRAC_PI_2,
+                );
                 cr.close_path();
                 cr.fill().unwrap();
             }
 
-            if !iter.next_line() { break; }
+            if !iter.next_line() {
+                break;
+            }
         }
-        
+
         cr.pop_group_to_source().unwrap();
         cr.paint_with_alpha(bg_a as f64).unwrap();
         cr.restore().unwrap();
