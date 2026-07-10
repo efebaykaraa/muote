@@ -1,0 +1,20 @@
+pkgname=engyls
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Shared Rust configuration library for Marxist Quote"
+arch=('any')
+url="https://github.com/efebaykaraa/marxist-quote"
+license=('unknown')
+source=("marxist-quote-${pkgver}.tar.gz::${url}/archive/refs/tags/v${pkgver}.tar.gz")
+sha256sums=('SKIP')
+
+package() {
+  cd "$srcdir/marxist-quote-$pkgver"
+
+  install -Dm644 engyls/Cargo.toml "$pkgdir/usr/share/engyls/Cargo.toml"
+  install -Dm644 engyls/src/lib.rs "$pkgdir/usr/share/engyls/src/lib.rs"
+  install -Dm644 engyls/src/config/mod.rs "$pkgdir/usr/share/engyls/src/config/mod.rs"
+  install -Dm644 engyls/src/config/manager.rs "$pkgdir/usr/share/engyls/src/config/manager.rs"
+  install -Dm644 engyls/src/config/types.rs "$pkgdir/usr/share/engyls/src/config/types.rs"
+  install -Dm644 engyls/src/config/utils.rs "$pkgdir/usr/share/engyls/src/config/utils.rs"
+}
