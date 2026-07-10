@@ -2,4 +2,7 @@
 pkg/
 src/
 *.pkg.tar*
+*.src.tar.gz
+dist/
+aur/*/*.tar.gz
 gnome-ui-guidelines.txt

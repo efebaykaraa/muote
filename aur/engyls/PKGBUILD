@@ -1,14 +1,16 @@
 pkgname=engyls
 pkgver=0.1.0
 pkgrel=1
-pkgdesc="Shared Rust configuration library for Marxist Quote"
+pkgdesc="Shared Rust configuration library for desktop quote applications"
 arch=('any')
 url="https://github.com/efebaykaraa/marxist-quote"
 license=('unknown')
-source=("marxist-quote-${pkgver}.tar.gz::${url}/archive/refs/tags/v${pkgver}.tar.gz")
+source=("engyls-${pkgver}.tar.gz::${url}/archive/refs/tags/v${pkgver}.tar.gz")
 sha256sums=('aadfd2c9314d8ad7d0650f3ffbb2b0a4a47dd6628a37bee3e7d6384108b3520b')
 
 package() {
+  # engyls currently lives in the marxist-quote monorepo; this package installs
+  # only the shared engyls crate files.
   cd "$srcdir/marxist-quote-$pkgver"
 
   install -Dm644 engyls/Cargo.toml "$pkgdir/usr/share/engyls/Cargo.toml"
