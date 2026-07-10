@@ -1,14 +1,12 @@
-# AUR package directories
+# AUR package directory
 
-This directory contains two separate AUR package submissions:
-
-- `engyls`: shared Rust configuration/source library package
-- `marxist-quote`: desktop overlay, settings GUI, fetcher, position tool, services, and desktop entry
+This directory contains the `marxist-quote` AUR package submission.
+The separate `engyls` package lives in the sibling `engyls` repository.
 
 Before publishing a release:
 
 1. Commit and push the release source.
 2. Create and push a matching Git tag, for example `v0.1.0`.
-3. In each package directory, replace `sha256sums=('SKIP')` with the real archive checksum using `updpkgsums`.
+3. Replace `sha256sums=('SKIP')` with the real archive checksums using `updpkgsums`.
 4. Regenerate `.SRCINFO` with `makepkg --printsrcinfo > .SRCINFO`.
-5. Publish each directory to its matching AUR Git repository.
+5. Publish `aur/marxist-quote` to the `marxist-quote` AUR Git repository.

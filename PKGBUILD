@@ -1,10 +1,13 @@
-pkgbase=marxist-quote
-pkgname=('engyls' 'marxist-quote')
+pkgname=marxist-quote
 pkgver=0.1.0
 pkgrel=1
+pkgdesc="Desktop quote overlay and settings UI"
 arch=('x86_64')
 license=('unknown')
+depends=('engyls' 'gtk3' 'gtk4' 'libadwaita' 'pango' 'cairo' 'glib2' 'hicolor-icon-theme')
 makedepends=('cargo')
+optdepends=('desktop-file-utils: update desktop entry cache during install hooks')
+install=marxist-quote.install
 source=()
 sha256sums=()
 
@@ -44,26 +47,7 @@ build() {
   cargo build --release --locked
 }
 
-package_engyls() {
-  pkgdesc="Shared Rust configuration library for Marxist Quote"
-  depends=('glibc')
-
-  cd "$startdir"
-
-  install -Dm644 engyls/Cargo.toml "$pkgdir/usr/share/engyls/Cargo.toml"
-  install -Dm644 engyls/src/lib.rs "$pkgdir/usr/share/engyls/src/lib.rs"
-  install -Dm644 engyls/src/config/mod.rs "$pkgdir/usr/share/engyls/src/config/mod.rs"
-  install -Dm644 engyls/src/config/manager.rs "$pkgdir/usr/share/engyls/src/config/manager.rs"
-  install -Dm644 engyls/src/config/types.rs "$pkgdir/usr/share/engyls/src/config/types.rs"
-  install -Dm644 engyls/src/config/utils.rs "$pkgdir/usr/share/engyls/src/config/utils.rs"
-}
-
-package_marxist-quote() {
-  pkgdesc="Desktop quote overlay and settings UI"
-  depends=('engyls' 'gtk3' 'gtk4' 'libadwaita' 'pango' 'cairo' 'glib2' 'hicolor-icon-theme')
-  optdepends=('desktop-file-utils: update desktop entry cache during install hooks')
-  install=marxist-quote.install
-
+package() {
   cd "$startdir"
 
   install -Dm755 target/release/gui "$pkgdir/usr/bin/marxist_quote"

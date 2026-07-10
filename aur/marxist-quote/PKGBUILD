@@ -9,10 +9,14 @@ depends=('engyls' 'gtk3' 'gtk4' 'libadwaita' 'pango' 'cairo' 'glib2' 'hicolor-ic
 makedepends=('cargo')
 optdepends=('desktop-file-utils: update desktop entry cache during install hooks')
 install=marxist-quote.install
-source=("marxist-quote-${pkgver}.tar.gz::${url}/archive/refs/tags/v${pkgver}.tar.gz")
-sha256sums=('aadfd2c9314d8ad7d0650f3ffbb2b0a4a47dd6628a37bee3e7d6384108b3520b')
+source=(
+  "${pkgname}-${pkgver}.tar.gz::${url}/archive/refs/tags/v${pkgver}.tar.gz"
+  "engyls-${pkgver}.tar.gz::https://github.com/efebaykaraa/engyls/archive/refs/tags/v${pkgver}.tar.gz"
+)
+sha256sums=('SKIP' 'SKIP')
 
 prepare() {
+  ln -sfn "$srcdir/engyls-$pkgver" "$srcdir/engyls"
   cd "$srcdir/marxist-quote-$pkgver"
 
   export CARGO_HOME="$srcdir/cargo-home"

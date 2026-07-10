@@ -1,5 +1,5 @@
 [workspace]
-members = ["engyls",
+members = [
     "gui",
     "wikiquote-fetcher",
     "desktop-quote",

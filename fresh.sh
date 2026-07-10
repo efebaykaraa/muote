@@ -20,8 +20,14 @@ systemctl --user daemon-reload
 
 # 5) Repo içindeki eski build/package çıktısını temizle
 rm -rf pkg src target *.pkg.tar.zst
+if [ -d ../engyls ]; then
+  rm -rf ../engyls/pkg ../engyls/target ../engyls/*.pkg.tar.zst
+fi
 
 # 6) Yeni paketleri build et ve kur
+if [ -d ../engyls ]; then
+  (cd ../engyls && makepkg -si --noconfirm)
+fi
 makepkg -si
 systemctl --user daemon-reload
 systemctl --user enable --now desktop-quote.service marxist-quote-fetch.timer
