@@ -2,7 +2,7 @@
 Type=Application
 Name=Marxist Quote
 Comment=Configure the desktop quote overlay
-Exec=marxist_quote
+Exec=marxist-quote-gui
 Icon=marxist-quote
 Terminal=false
 Categories=GTK;Utility;Settings;

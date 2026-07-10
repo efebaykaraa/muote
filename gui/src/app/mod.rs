@@ -680,21 +680,18 @@ impl Component for AppModel {
             AppInput::ShowInteractivePicker => {
                 let bin_path = std::env::current_exe()
                     .ok()
-                    .and_then(|p| p.parent().map(|p| p.to_path_buf()))
-                    .and_then(|dir| {
-                        let path = dir.join("position-containers");
-                        if path.exists() { Some(path) } else { None }
-                    });
+                    .filter(|path| path.exists());
 
                 if let Some(ref path) = bin_path {
-                    log::info!("Launching position-containers at: {:?}", path);
+                    log::info!("Launching position picker via GUI binary at: {:?}", path);
                 } else {
-                    log::error!("position-containers binary not found next to GUI binary");
+                    log::error!("Current executable path not available for position picker");
                     return;
                 }
 
                 let json = serde_json::to_string(&self.settings).unwrap_or_default();
                 match std::process::Command::new(bin_path.unwrap())
+                    .arg("--position-picker")
                     .env("MARXIST_QUOTE_PLACE_ARGS", json)
                     .spawn()
                 {

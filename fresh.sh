@@ -27,3 +27,5 @@ if [ -d ../wikiquote-fetcher ]; then
   (cd ../wikiquote-fetcher && makepkg -si --noconfirm)
 fi
 makepkg -si
+systemctl --user daemon-reload
+systemctl --user enable --now desktop-quote.service marxist-quote-fetch.timer

@@ -1,6 +1,6 @@
 [package]
-name = "gui"
-version = "0.1.9"
+name = "marxist-quote-gui"
+version = "0.2.0"
 edition = "2024"
 license = "GPL-3.0-or-later"
 
@@ -15,6 +15,7 @@ dirs = "6.0"
 anyhow = "1.0"
 sha1 = "0.10"
 marxist-quote-core = { path = "../core" }
+position-containers = { path = "../position-containers" }
 wikiquote-fetcher = { path = "../../wikiquote-fetcher" }
 simplelog = "0.12.2"
 log = "0.4.29"

@@ -1,12 +1,11 @@
 pkgname=marxist-quote
-pkgver=0.1.9
+pkgver=0.2.0
 pkgrel=1
 pkgdesc="Graphical settings UI for Marxist Quote"
 arch=('x86_64')
 url="https://github.com/efebaykaraa/marxist-quote"
 license=('GPL-3.0-or-later')
 depends=(
-  'wikiquote-fetcher'
   'gtk3'
   'gtk4'
   'libadwaita'
@@ -60,7 +59,9 @@ build() {
 package() {
   cd "$startdir"
 
-  install -Dm755 target/release/gui "$pkgdir/usr/bin/marxist_quote"
+  install -Dm755 target/release/marxist-quote-gui "$pkgdir/usr/bin/marxist-quote-gui"
+  install -Dm755 target/release/marxist-quote-background "$pkgdir/usr/bin/marxist-quote-background"
+  ln -s marxist-quote-gui "$pkgdir/usr/bin/marxist_quote"
 
   install -Dm644 assets/marxist_quote.desktop \
     "$pkgdir/usr/share/applications/marxist_quote.desktop"
@@ -91,4 +92,11 @@ package() {
       break
     fi
   done
+
+  install -Dm644 assets/desktop-quote.service \
+    "$pkgdir/usr/lib/systemd/user/desktop-quote.service"
+  install -Dm644 assets/marxist-quote-fetch.service \
+    "$pkgdir/usr/lib/systemd/user/marxist-quote-fetch.service"
+  install -Dm644 assets/marxist-quote-fetch.timer \
+    "$pkgdir/usr/lib/systemd/user/marxist-quote-fetch.timer"
 }
