@@ -1,4 +1,4 @@
-use engyls::config::{DisplayArgs, HorizontalAlign, VerticalAlign, parse_color_to_rgba};
+use marxist_quote_core::config::{DisplayArgs, HorizontalAlign, VerticalAlign, parse_color_to_rgba};
 use pango::FontDescription;
 use pangocairo::functions as pc;
 

@@ -1,4 +1,4 @@
-use engyls::config::{HorizontalAlign, VerticalAlign};
+use marxist_quote_core::config::{HorizontalAlign, VerticalAlign};
 
 #[derive(Debug)]
 pub enum AppInput {

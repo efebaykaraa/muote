@@ -268,7 +268,7 @@ dependencies = [
 
 [[package]]
 name = "desktop-quote"
-version = "0.1.7"
+version = "0.1.8"
 dependencies = [
  "anyhow",
  "cairo-rs 0.18.5",
@@ -357,13 +357,9 @@ checksum = "b2972feb8dffe7bc8c5463b1dacda1b0dfbed3710e50f977d965429692d74cd8"
 
 [[package]]
 name = "engyls"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
- "anyhow",
- "dirs",
- "serde",
- "serde_json",
- "sha1",
+ "gtk",
 ]
 
 [[package]]
@@ -1029,11 +1025,10 @@ dependencies = [
 
 [[package]]
 name = "gui"
-version = "0.1.7"
+version = "0.1.8"
 dependencies = [
  "anyhow",
  "dirs",
- "engyls",
  "gtk4",
  "libadwaita",
  "log",
@@ -1317,14 +1312,14 @@ dependencies = [
 
 [[package]]
 name = "marxist-quote-core"
-version = "0.1.7"
+version = "0.1.8"
 dependencies = [
  "anyhow",
  "dirs",
- "engyls",
  "rand 0.9.4",
  "serde",
  "serde_json",
+ "sha1",
  "wikiquote-fetcher",
 ]
 
@@ -1602,12 +1597,11 @@ checksum = "19f132c84eca552bf34cab8ec81f1c1dcc229b811638f9d283dceabe58c5569e"
 
 [[package]]
 name = "position-containers"
-version = "0.1.7"
+version = "0.1.8"
 dependencies = [
  "anyhow",
  "cairo-rs 0.20.12",
  "dirs",
- "engyls",
  "gtk4",
  "libadwaita",
  "marxist-quote-core",

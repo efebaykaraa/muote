@@ -13,7 +13,7 @@ use state::State;
 
 fn main() -> glib::ExitCode {
     let app = Application::builder()
-        .application_id("com.github.engyls.Place")
+        .application_id("com.github.marxist_quote.Place")
         .build();
 
     app.connect_startup(|_| {
@@ -26,13 +26,13 @@ fn main() -> glib::ExitCode {
 
 fn build_ui(app: &Application) {
     let args_os: Vec<String> = std::env::args().collect();
-    let args = if let Ok(json) = std::env::var("ENGYLS_PLACE_ARGS") {
-        match serde_json::from_str::<engyls::config::DisplayArgs>(&json) {
+    let args = if let Ok(json) = std::env::var("MARXIST_QUOTE_PLACE_ARGS") {
+        match serde_json::from_str::<marxist_quote_core::config::DisplayArgs>(&json) {
             Ok(a) => a,
             Err(_) => marxist_quote_core::load_settings().0,
         }
     } else if args_os.len() > 1 {
-        match serde_json::from_str::<engyls::config::DisplayArgs>(&args_os[1]) {
+        match serde_json::from_str::<marxist_quote_core::config::DisplayArgs>(&args_os[1]) {
             Ok(a) => a,
             Err(_) => marxist_quote_core::load_settings().0,
         }

@@ -1,6 +1,6 @@
 [package]
 name = "gui"
-version = "0.1.7"
+version = "0.1.8"
 edition = "2024"
 license = "GPL-3.0-or-later"
 
@@ -14,7 +14,6 @@ toml = "0.8"
 dirs = "6.0"
 anyhow = "1.0"
 sha1 = "0.10"
-engyls = { path = "../../engyls", default-features = false }
 marxist-quote-core = { path = "../core" }
 wikiquote-fetcher = { path = "../../wikiquote-fetcher" }
 simplelog = "0.12.2"

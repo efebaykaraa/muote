@@ -1,17 +1,13 @@
 use crate::draw::draw_quote;
-use engyls::config::DisplayArgs;
 use gtk::prelude::*;
+use marxist_quote_core::config::DisplayArgs;
 
 pub fn run_display(args: DisplayArgs, quote_text: &str, author_text: &str) {
-    // Force X11 backend so GNOME allows absolute positioning and hiding from taskbar.
-    unsafe {
-        std::env::set_var("GDK_BACKEND", "x11");
-    }
+    engyls::desktop::force_x11_backend();
+    engyls::desktop::init_gtk();
 
-    gtk::init().expect("Failed to initialize GTK.");
-
-    let window = build_desktop_window();
-    enable_transparency(&window);
+    let window = engyls::desktop::build_desktop_window("Marxist Quote");
+    engyls::desktop::enable_transparency(&window);
 
     let (window_x, window_y, window_width, window_height) =
         display_bounds(&args, !author_text.is_empty());
@@ -34,26 +30,7 @@ pub fn run_display(args: DisplayArgs, quote_text: &str, author_text: &str) {
     window.show_all();
     window.move_(window_x, window_y);
 
-    gtk::main();
-}
-
-fn build_desktop_window() -> gtk::Window {
-    let window = gtk::Window::new(gtk::WindowType::Toplevel);
-    window.set_title("Marxist Quote");
-    window.set_decorated(false);
-    window.set_app_paintable(true);
-    window.set_keep_below(true);
-    window.set_skip_taskbar_hint(true);
-    window.set_skip_pager_hint(true);
-    window.set_accept_focus(false);
-    window.set_type_hint(gtk::gdk::WindowTypeHint::Desktop);
-    window
-}
-
-fn enable_transparency(window: &gtk::Window) {
-    let screen = gtk::prelude::WidgetExt::screen(window).unwrap();
-    let visual = screen.rgba_visual().unwrap();
-    window.set_visual(Some(&visual));
+    engyls::desktop::run_main();
 }
 
 fn display_bounds(args: &DisplayArgs, has_author: bool) -> (i32, i32, i32, i32) {

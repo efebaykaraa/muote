@@ -1,4 +1,6 @@
-use engyls::config::{ConfigManager, DisplayArgs};
+pub mod config;
+
+use config::{ConfigManager, DisplayArgs};
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;

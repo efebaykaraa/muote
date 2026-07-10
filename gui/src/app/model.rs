@@ -1,6 +1,6 @@
 use crate::app::input::AppInput;
 use adw::prelude::*;
-use engyls::config::DisplayArgs;
+use marxist_quote_core::config::DisplayArgs;
 use marxist_quote_core::{Author, AuthorsConfig};
 use relm4::{ComponentSender, gtk};
 

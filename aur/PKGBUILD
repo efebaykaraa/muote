@@ -1,6 +1,6 @@
 pkgname=marxist-quote
-pkgver=0.1.7
-_engylsver=1.0.1
+pkgver=0.1.8
+_engylsver=1.0.2
 _wikiquotefetcherver=1.0.1
 pkgrel=1
 pkgdesc="Graphical settings UI for Marxist Quote"
