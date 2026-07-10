@@ -9,4 +9,4 @@ Before publishing a release:
 2. Create and push a matching Git tag, for example `v0.1.0`.
 3. Replace `sha256sums=('SKIP')` with the real archive checksums using `updpkgsums`.
 4. Regenerate `.SRCINFO` with `makepkg --printsrcinfo > .SRCINFO`.
-5. Publish `aur/marxist-quote` to the `marxist-quote` AUR Git repository.
+5. Publish the contents of this `aur` directory to the `marxist-quote` AUR Git repository.
