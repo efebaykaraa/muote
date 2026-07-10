@@ -1,6 +1,6 @@
 pkgname=marxist-quote
-pkgver=0.1.6
-pkgrel=3
+pkgver=0.1.7
+pkgrel=1
 pkgdesc="Graphical settings UI for Marxist Quote"
 arch=('x86_64')
 url="https://github.com/efebaykaraa/marxist-quote"

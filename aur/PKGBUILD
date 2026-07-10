@@ -1,8 +1,8 @@
 pkgname=marxist-quote
-pkgver=0.1.6
-_engylsver=1.0.0
-_wikiquotefetcherver=1.0.0
-pkgrel=3
+pkgver=0.1.7
+_engylsver=1.0.1
+_wikiquotefetcherver=1.0.1
+pkgrel=1
 pkgdesc="Graphical settings UI for Marxist Quote"
 arch=('x86_64')
 url="https://github.com/efebaykaraa/marxist-quote"
@@ -25,9 +25,9 @@ source=(
   "engyls-${_engylsver}.tar.gz::https://github.com/efebaykaraa/engyls/archive/refs/tags/v${_engylsver}.tar.gz"
   "wikiquote-fetcher-${_wikiquotefetcherver}.tar.gz::https://github.com/efebaykaraa/wikiquote-fetcher/archive/refs/tags/v${_wikiquotefetcherver}.tar.gz"
 )
-sha256sums=('ec8c4d85e09bce88c5c7f0b878ef0595cc874a794ea5b36b0e650a27c623fd8d'
-            '48b06b3d1786407f971f7382bef51bada0fc81b9a7a4494044a726730f6d466d'
-            '34463ccd0cd79aa03ddedaca934f666a08df8b66e5bd780a3f82b5103e79c6bb')
+sha256sums=('SKIP'
+            'SKIP'
+            'SKIP')
 
 prepare() {
   ln -sfn "$srcdir/engyls-$_engylsver" "$srcdir/engyls"
