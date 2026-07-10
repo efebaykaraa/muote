@@ -6,13 +6,12 @@ pub mod widget;
 
 use adw::prelude::*;
 pub use details::{background::bg_details, shadow::shadow_component};
-use engyls::config::{ConfigManager, HorizontalAlign, VerticalAlign};
+use engyls::config::{HorizontalAlign, VerticalAlign};
 use gtk::Revealer;
 pub use input::AppInput;
 pub use model::AppModel;
 use relm4::{Component, ComponentParts, ComponentSender, RelmWidgetExt, adw, gtk};
 pub use static_components::separator;
-use wikiquote_fetcher as fetch;
 
 use crate::app::widget::AppWidgets;
 
@@ -650,10 +649,10 @@ impl Component for AppModel {
             }
             AppInput::DismissAuthorNote => {
                 self.authors.show_weight_note = false;
-                let _ = ConfigManager::save_authors(&self.authors);
+                let _ = marxist_quote_core::save_authors(&self.authors);
             }
             AppInput::Save => {
-                let (saved_settings, _) = ConfigManager::load_settings();
+                let (saved_settings, _) = marxist_quote_core::load_settings();
                 let language_changed =
                     saved_settings.appearance.language != self.settings.appearance.language;
                 self.settings.appearance.quote_x = saved_settings.appearance.quote_x;
@@ -667,11 +666,11 @@ impl Component for AppModel {
                 self.settings.appearance.max_quote_chars =
                     saved_settings.appearance.max_quote_chars;
                 self.settings.appearance.position_hash = self.settings.calculate_position_hash();
-                let _ = ConfigManager::save_authors(&self.authors);
-                let _ = ConfigManager::save_settings(&self.settings);
+                let _ = marxist_quote_core::save_authors(&self.authors);
+                let _ = marxist_quote_core::save_settings(&self.settings);
                 std::thread::spawn(move || {
-                    if language_changed || !fetch::current_quote_exists() {
-                        if let Err(e) = fetch::fetch_quote() {
+                    if language_changed || !marxist_quote_core::current_quote_exists() {
+                        if let Err(e) = marxist_quote_core::fetch_quote() {
                             log::error!("Error fetching quote after save: {}", e);
                         }
                     }
@@ -705,7 +704,7 @@ impl Component for AppModel {
             }
             AppInput::FetchQuoteNow => {
                 std::thread::spawn(|| {
-                    if let Err(e) = fetch::fetch_quote() {
+                    if let Err(e) = marxist_quote_core::fetch_quote() {
                         log::error!("Error: {}", e);
                     } else {
                         restart_desktop_service();
@@ -714,7 +713,7 @@ impl Component for AppModel {
             }
             AppInput::SkipQuote => {
                 std::thread::spawn(|| {
-                    if let Err(e) = fetch::fetch_quote() {
+                    if let Err(e) = marxist_quote_core::fetch_quote() {
                         log::error!("Error skipping quote: {}", e);
                     } else {
                         restart_desktop_service();

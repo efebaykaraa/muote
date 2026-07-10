@@ -1,14 +1,12 @@
 mod app;
 
-use engyls::config::ConfigManager;
 use simplelog::*;
 use std::env;
 use std::fs::File;
-use wikiquote_fetcher as fetch;
 
 fn main() {
-    let log_path = ConfigManager::config_dir().join("gui.log");
-    let _ = std::fs::create_dir_all(ConfigManager::config_dir());
+    let log_path = marxist_quote_core::config_dir().join("gui.log");
+    let _ = std::fs::create_dir_all(marxist_quote_core::config_dir());
 
     let _ = CombinedLogger::init(vec![
         TermLogger::new(
@@ -28,7 +26,7 @@ fn main() {
 
     let args: Vec<String> = env::args().collect();
     if args.iter().any(|a| a == "--fetch") {
-        if let Err(e) = fetch::fetch_quote() {
+        if let Err(e) = marxist_quote_core::fetch_quote() {
             log::error!("Error fetching quote: {}", e);
         }
         return;

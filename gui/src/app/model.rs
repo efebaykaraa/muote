@@ -1,6 +1,7 @@
 use crate::app::input::AppInput;
 use adw::prelude::*;
-use engyls::config::{Author, AuthorsConfig, ConfigManager, DisplayArgs};
+use engyls::config::DisplayArgs;
+use marxist_quote_core::{Author, AuthorsConfig};
 use relm4::{ComponentSender, gtk};
 
 #[derive(Clone)]
@@ -13,8 +14,8 @@ pub struct AppModel {
 
 impl AppModel {
     pub fn init_model() -> Self {
-        let (authors, authors_hash) = ConfigManager::load_authors();
-        let (settings, settings_hash) = ConfigManager::load_settings();
+        let (authors, authors_hash) = marxist_quote_core::load_authors();
+        let (settings, settings_hash) = marxist_quote_core::load_settings();
 
         AppModel {
             authors,

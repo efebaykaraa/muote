@@ -8,7 +8,6 @@ mod events;
 mod state;
 
 use draw::draw_scene;
-use engyls::config::ConfigManager;
 use events::{DragMode, HoverTarget, hit_test, snap_to_line};
 use state::State;
 
@@ -30,15 +29,15 @@ fn build_ui(app: &Application) {
     let args = if let Ok(json) = std::env::var("ENGYLS_PLACE_ARGS") {
         match serde_json::from_str::<engyls::config::DisplayArgs>(&json) {
             Ok(a) => a,
-            Err(_) => ConfigManager::load_settings().0,
+            Err(_) => marxist_quote_core::load_settings().0,
         }
     } else if args_os.len() > 1 {
         match serde_json::from_str::<engyls::config::DisplayArgs>(&args_os[1]) {
             Ok(a) => a,
-            Err(_) => ConfigManager::load_settings().0,
+            Err(_) => marxist_quote_core::load_settings().0,
         }
     } else {
-        ConfigManager::load_settings().0
+        marxist_quote_core::load_settings().0
     };
 
     let (sw, sh) = if let Some(display) = gtk::gdk::Display::default() {
@@ -242,7 +241,7 @@ fn build_ui(app: &Application) {
         s.args.appearance.position_hash = s.args.calculate_position_hash();
 
         // Save
-        let _ = ConfigManager::save_settings(&s.args);
+        let _ = marxist_quote_core::save_settings(&s.args);
         println!(
             "Saved. Container {}×{}, max_quote_chars={}",
             s.args.appearance.quote_max_width,

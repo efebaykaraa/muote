@@ -1,17 +1,10 @@
-use std::path::PathBuf;
-
 pub struct CachedQuote {
     pub text: String,
     pub author: String,
 }
 
 pub fn load_current_quote() -> CachedQuote {
-    let cache_file = dirs::cache_dir()
-        .unwrap_or_else(|| PathBuf::from("~/.cache"))
-        .join("marxist_quote")
-        .join("current_quote.txt");
-
-    let raw_text = std::fs::read_to_string(cache_file).unwrap_or_default();
+    let raw_text = std::fs::read_to_string(marxist_quote_core::cache_file_path()).unwrap_or_default();
     parse_cached_quote(&raw_text)
 }
 
