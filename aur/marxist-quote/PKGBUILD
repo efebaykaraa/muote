@@ -1,5 +1,6 @@
 pkgname=marxist-quote
-pkgver=0.1.0
+pkgver=0.1.1
+_engylsver=0.1.0
 pkgrel=1
 pkgdesc="Desktop quote overlay and settings UI"
 arch=('x86_64')
@@ -11,12 +12,12 @@ optdepends=('desktop-file-utils: update desktop entry cache during install hooks
 install=marxist-quote.install
 source=(
   "${pkgname}-${pkgver}.tar.gz::${url}/archive/refs/tags/v${pkgver}.tar.gz"
-  "engyls-${pkgver}.tar.gz::https://github.com/efebaykaraa/engyls/archive/refs/tags/v${pkgver}.tar.gz"
+  "engyls-${_engylsver}.tar.gz::https://github.com/efebaykaraa/engyls/archive/refs/tags/v${_engylsver}.tar.gz"
 )
 sha256sums=('SKIP' 'SKIP')
 
 prepare() {
-  ln -sfn "$srcdir/engyls-$pkgver" "$srcdir/engyls"
+  ln -sfn "$srcdir/engyls-$_engylsver" "$srcdir/engyls"
   cd "$srcdir/marxist-quote-$pkgver"
 
   export CARGO_HOME="$srcdir/cargo-home"

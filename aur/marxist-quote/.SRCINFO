@@ -1,6 +1,6 @@
 pkgbase = marxist-quote
 	pkgdesc = Desktop quote overlay and settings UI
-	pkgver = 0.1.0
+	pkgver = 0.1.1
 	pkgrel = 1
 	url = https://github.com/efebaykaraa/marxist-quote
 	install = marxist-quote.install
@@ -16,7 +16,7 @@ pkgbase = marxist-quote
 	depends = glib2
 	depends = hicolor-icon-theme
 	optdepends = desktop-file-utils: update desktop entry cache during install hooks
-	source = marxist-quote-0.1.0.tar.gz::https://github.com/efebaykaraa/marxist-quote/archive/refs/tags/v0.1.0.tar.gz
+	source = marxist-quote-0.1.1.tar.gz::https://github.com/efebaykaraa/marxist-quote/archive/refs/tags/v0.1.1.tar.gz
 	source = engyls-0.1.0.tar.gz::https://github.com/efebaykaraa/engyls/archive/refs/tags/v0.1.0.tar.gz
 	sha256sums = SKIP
 	sha256sums = SKIP
