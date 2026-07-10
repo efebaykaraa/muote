@@ -6,6 +6,6 @@ pkgbase = engyls
 	arch = any
 	license = unknown
 	source = marxist-quote-0.1.0.tar.gz::https://github.com/efebaykaraa/marxist-quote/archive/refs/tags/v0.1.0.tar.gz
-	sha256sums = SKIP
+	sha256sums = aadfd2c9314d8ad7d0650f3ffbb2b0a4a47dd6628a37bee3e7d6384108b3520b
 
 pkgname = engyls

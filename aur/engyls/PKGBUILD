@@ -6,7 +6,7 @@ arch=('any')
 url="https://github.com/efebaykaraa/marxist-quote"
 license=('unknown')
 source=("marxist-quote-${pkgver}.tar.gz::${url}/archive/refs/tags/v${pkgver}.tar.gz")
-sha256sums=('SKIP')
+sha256sums=('aadfd2c9314d8ad7d0650f3ffbb2b0a4a47dd6628a37bee3e7d6384108b3520b')
 
 package() {
   cd "$srcdir/marxist-quote-$pkgver"
