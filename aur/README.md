@@ -1,7 +1,7 @@
 # AUR package directory
 
 This directory contains the `marxist-quote` AUR package submission.
-The separate `engyls` package lives in the sibling `engyls` repository.
+The separate `engyls` and `wikiquote-fetcher` packages live in sibling repositories.
 
 Before publishing a release:
 

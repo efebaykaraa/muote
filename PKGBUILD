@@ -1,10 +1,10 @@
 pkgname=marxist-quote
-pkgver=0.1.1
+pkgver=0.1.2
 pkgrel=1
 pkgdesc="Desktop quote overlay and settings UI"
 arch=('x86_64')
 license=('unknown')
-depends=('engyls' 'gtk3' 'gtk4' 'libadwaita' 'pango' 'cairo' 'glib2' 'hicolor-icon-theme')
+depends=('engyls' 'wikiquote-fetcher' 'gtk3' 'gtk4' 'libadwaita' 'pango' 'cairo' 'glib2' 'hicolor-icon-theme')
 makedepends=('cargo')
 optdepends=('desktop-file-utils: update desktop entry cache during install hooks')
 install=marxist-quote.install
@@ -51,7 +51,6 @@ package() {
   cd "$startdir"
 
   install -Dm755 target/release/gui "$pkgdir/usr/bin/marxist_quote"
-  install -Dm755 target/release/wikiquote-fetcher "$pkgdir/usr/bin/wikiquote-fetcher"
   install -Dm755 target/release/desktop-quote "$pkgdir/usr/bin/desktop-quote"
   install -Dm755 target/release/position-containers "$pkgdir/usr/bin/position-containers"
 

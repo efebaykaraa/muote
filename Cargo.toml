@@ -1,7 +1,6 @@
 [workspace]
 members = [
     "gui",
-    "wikiquote-fetcher",
     "desktop-quote",
     "position-containers"
 ]
