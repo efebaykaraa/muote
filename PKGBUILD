@@ -1,11 +1,10 @@
 pkgname=marxist-quote
-pkgver=0.1.4
+pkgver=0.1.5
 pkgrel=1
 pkgdesc="Desktop quote overlay and settings UI"
 arch=('x86_64')
 license=('GPL-3.0-or-later')
 depends=(
-  'engyls'
   'wikiquote-fetcher'
   'gtk3'
   'gtk4'
