@@ -1,10 +1,20 @@
 pkgname=marxist-quote
-pkgver=0.1.2
+pkgver=0.1.3
 pkgrel=1
 pkgdesc="Desktop quote overlay and settings UI"
 arch=('x86_64')
-license=('unknown')
-depends=('engyls' 'wikiquote-fetcher' 'gtk3' 'gtk4' 'libadwaita' 'pango' 'cairo' 'glib2' 'hicolor-icon-theme')
+license=('GPL-3.0-or-later')
+depends=(
+  'engyls'
+  'wikiquote-fetcher'
+  'gtk3'
+  'gtk4'
+  'libadwaita'
+  'pango'
+  'cairo'
+  'glib2'
+  'hicolor-icon-theme'
+)
 makedepends=('cargo')
 optdepends=('desktop-file-utils: update desktop entry cache during install hooks')
 install=marxist-quote.install
@@ -56,6 +66,7 @@ package() {
 
   install -Dm644 assets/marxist_quote.desktop \
     "$pkgdir/usr/share/applications/marxist_quote.desktop"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 
   for size in 16 24 32 48 64 128 256; do
     for icon in \
