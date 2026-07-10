@@ -1,43 +1,40 @@
+#!/bin/sh
+# Minimal install script for the package. Left intentionally minimal
+# to satisfy makepkg when `install="$pkgname.install"` is set in PKGBUILD.
+
 post_install() {
-  systemctl --global enable engyls-quote.service >/dev/null 2>&1 || true
-  systemctl --global enable marxist-quote-fetch.timer >/dev/null 2>&1 || true
-  _engyls_restart_user_units
-}
+    cat <<'EOF'
 
-post_upgrade() {
-  systemctl --global enable engyls-quote.service >/dev/null 2>&1 || true
-  systemctl --global enable marxist-quote-fetch.timer >/dev/null 2>&1 || true
-  _engyls_restart_user_units
-}
+To enable the user services after installing with makepkg or an AUR helper, run as the target user:
 
-post_remove() {
-  systemctl --global disable engyls-quote.service >/dev/null 2>&1 || true
-  systemctl --global disable marxist-quote-fetch.timer >/dev/null 2>&1 || true
-  _engyls_reload_user_managers
-}
+  systemctl --user daemon-reload
+  systemctl --user enable --now desktop-quote.service marxist-quote-fetch.timer
 
-_engyls_reload_user_managers() {
-  while read -r uid user; do
-    [ -n "$uid" ] || continue
-    [ -n "$user" ] || continue
-    runuser -u "$user" -- env XDG_RUNTIME_DIR="/run/user/$uid" \
-      systemctl --user daemon-reload >/dev/null 2>&1 || true
-  done <<EOF
-$(loginctl list-users --no-legend 2>/dev/null)
+If you want the services to run outside an active login session, also enable linger:
+
+  loginctl enable-linger "$USER"
+
 EOF
 }
 
-_engyls_restart_user_units() {
-  while read -r uid user; do
-    [ -n "$uid" ] || continue
-    [ -n "$user" ] || continue
-    runuser -u "$user" -- env XDG_RUNTIME_DIR="/run/user/$uid" \
-      systemctl --user daemon-reload >/dev/null 2>&1 || true
-    runuser -u "$user" -- env XDG_RUNTIME_DIR="/run/user/$uid" \
-      systemctl --user restart engyls-quote.service >/dev/null 2>&1 || true
-    runuser -u "$user" -- env XDG_RUNTIME_DIR="/run/user/$uid" \
-      systemctl --user restart marxist-quote-fetch.timer >/dev/null 2>&1 || true
-  done <<EOF
-$(loginctl list-users --no-legend 2>/dev/null)
+post_upgrade() {
+    cat <<'EOF'
+
+The package was upgraded. Reload user service files and restart the services if needed:
+
+  systemctl --user daemon-reload
+  systemctl --user restart desktop-quote.service
+  systemctl --user restart marxist-quote-fetch.timer
+
+EOF
+}
+
+pre_remove() {
+    cat <<'EOF'
+
+If you remove this package, you may also want to stop and disable the user services:
+
+  systemctl --user disable --now desktop-quote.service marxist-quote-fetch.timer
+
 EOF
 }

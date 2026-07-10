@@ -1,10 +1,10 @@
 mod app;
 
 use engyls::config::ConfigManager;
-use engyls::fetch;
 use simplelog::*;
 use std::env;
 use std::fs::File;
+use wikiquote_fetcher as fetch;
 
 fn main() {
     let log_path = ConfigManager::config_dir().join("gui.log");

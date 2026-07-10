@@ -3,5 +3,5 @@ pub mod types;
 pub mod utils;
 
 pub use manager::ConfigManager;
-pub use types::{Appearance, Author, AuthorsConfig, DisplayArgs};
+pub use types::{Appearance, Author, AuthorsConfig, DisplayArgs, HorizontalAlign, VerticalAlign};
 pub use utils::{parse_color_to_rgba, rgba_to_hex};

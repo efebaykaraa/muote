@@ -1,11 +1,11 @@
 [Unit]
-Description=Engyls desktop quote overlay
+Description=Desktop quote overlay
 After=graphical-session.target
 PartOf=graphical-session.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/engyls-quote
+ExecStart=/usr/bin/desktop-quote
 Restart=on-failure
 RestartSec=3
 

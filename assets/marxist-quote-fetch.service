@@ -1,8 +1,9 @@
 [Unit]
-Description=Fetch daily quote using getquotes
+Description=Fetch daily quote from WikiQuote
 After=network-online.target
 Wants=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/marxist_quote --fetch
+ExecStart=/usr/bin/wikiquote-fetcher
+ExecStartPost=/usr/bin/systemctl --user restart desktop-quote.service

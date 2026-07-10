@@ -1,7 +1,8 @@
 [workspace]
 members = ["engyls",
     "gui",
-    "engyls-quote",
-    "engyls-place"
+    "wikiquote-fetcher",
+    "desktop-quote",
+    "position-containers"
 ]
 resolver = "2"
