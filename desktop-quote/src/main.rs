@@ -1,4 +1,5 @@
 mod draw;
+mod desktop;
 mod quote_cache;
 mod window;
 

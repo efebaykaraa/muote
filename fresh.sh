@@ -2,10 +2,9 @@
 
 # 1) Eski user servislerini durdur/disable et
 systemctl --user disable --now desktop-quote.service marxist-quote-fetch.timer 2>/dev/null || true
-systemctl --user disable --now engyls-quote.service 2>/dev/null || true
 
 # 2) Paketleri kaldır
-sudo pacman -Rns engyls wikiquote-fetcher marxist-quote 2>/dev/null || true
+sudo pacman -Rns wikiquote-fetcher marxist-quote 2>/dev/null || true
 
 # 3) Eski config/cache kalıntılarını sil
 rm -rf ~/.config/marxist_quote
@@ -15,22 +14,15 @@ rm -rf ~/.cache/marxist_quote
 rm -f ~/.config/systemd/user/desktop-quote.service
 rm -f ~/.config/systemd/user/marxist-quote-fetch.service
 rm -f ~/.config/systemd/user/marxist-quote-fetch.timer
-rm -f ~/.config/systemd/user/engyls-quote.service
 systemctl --user daemon-reload
 
 # 5) Repo içindeki eski build/package çıktısını temizle
 rm -rf pkg src target *.pkg.tar.zst
-if [ -d ../engyls ]; then
-  rm -rf ../engyls/pkg ../engyls/target ../engyls/*.pkg.tar.zst
-fi
 if [ -d ../wikiquote-fetcher ]; then
   rm -rf ../wikiquote-fetcher/pkg ../wikiquote-fetcher/target ../wikiquote-fetcher/*.pkg.tar.zst
 fi
 
 # 6) Yeni paketleri build et ve kur
-if [ -d ../engyls ]; then
-  (cd ../engyls && makepkg -si --noconfirm)
-fi
 if [ -d ../wikiquote-fetcher ]; then
   (cd ../wikiquote-fetcher && makepkg -si --noconfirm)
 fi

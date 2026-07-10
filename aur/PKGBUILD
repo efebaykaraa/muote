@@ -1,6 +1,5 @@
 pkgname=marxist-quote
-pkgver=0.1.8
-_engylsver=1.0.2
+pkgver=0.1.9
 _wikiquotefetcherver=1.0.1
 pkgrel=1
 pkgdesc="Graphical settings UI for Marxist Quote"
@@ -22,15 +21,12 @@ optdepends=('desktop-file-utils: update desktop entry cache during install hooks
 install=marxist-quote.install
 source=(
   "${pkgname}-${pkgver}.tar.gz::${url}/archive/refs/tags/v${pkgver}.tar.gz"
-  "engyls-${_engylsver}.tar.gz::https://github.com/efebaykaraa/engyls/archive/refs/tags/v${_engylsver}.tar.gz"
   "wikiquote-fetcher-${_wikiquotefetcherver}.tar.gz::https://github.com/efebaykaraa/wikiquote-fetcher/archive/refs/tags/v${_wikiquotefetcherver}.tar.gz"
 )
 sha256sums=('SKIP'
-            'SKIP'
             'SKIP')
 
 prepare() {
-  ln -sfn "$srcdir/engyls-$_engylsver" "$srcdir/engyls"
   ln -sfn "$srcdir/wikiquote-fetcher-$_wikiquotefetcherver" "$srcdir/wikiquote-fetcher"
   cd "$srcdir/marxist-quote-$pkgver"
 

@@ -3,11 +3,11 @@ use gtk::prelude::*;
 use marxist_quote_core::config::DisplayArgs;
 
 pub fn run_display(args: DisplayArgs, quote_text: &str, author_text: &str) {
-    engyls::desktop::force_x11_backend();
-    engyls::desktop::init_gtk();
+    crate::desktop::force_x11_backend();
+    crate::desktop::init_gtk();
 
-    let window = engyls::desktop::build_desktop_window("Marxist Quote");
-    engyls::desktop::enable_transparency(&window);
+    let window = crate::desktop::build_desktop_window("Marxist Quote");
+    crate::desktop::enable_transparency(&window);
 
     let (window_x, window_y, window_width, window_height) =
         display_bounds(&args, !author_text.is_empty());
@@ -30,7 +30,7 @@ pub fn run_display(args: DisplayArgs, quote_text: &str, author_text: &str) {
     window.show_all();
     window.move_(window_x, window_y);
 
-    engyls::desktop::run_main();
+    crate::desktop::run_main();
 }
 
 fn display_bounds(args: &DisplayArgs, has_author: bool) -> (i32, i32, i32, i32) {
