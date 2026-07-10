@@ -1,2 +1,5 @@
 /target
+pkg/
+src/
+*.pkg.tar*
 gnome-ui-guidelines.txt
