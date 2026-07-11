@@ -1,5 +1,7 @@
 # Marxist Quote
 
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/9938e8cf-a750-406f-a19f-3bc29a497e79" />
+
 Marxist Quote is the GTK/libadwaita settings UI for the Marxist Quote desktop quote system. It owns its application settings, author weights, and desktop display behavior, and uses `wikiquote-fetcher` for reusable quote fetching.
 
 The Arch package installs two application binaries:
