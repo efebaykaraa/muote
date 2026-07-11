@@ -4,6 +4,15 @@
 
 Marxist Quote is the GTK/libadwaita settings UI for the Marxist Quote desktop quote system. It owns its application settings, author weights, and desktop display behavior, and uses `wikiquote-fetcher` for reusable quote fetching.
 
+## AUR
+
+> [!TIP]
+> **marxist-quote** is available on the Arch User Repository: [`marxist-quote`](https://aur.archlinux.org/packages/marxist-quote)
+>
+> ```sh
+> yay -S marxist-quote
+> ```
+
 The Arch package installs two application binaries:
 
 - `marxist-quote-gui`: graphical settings UI
