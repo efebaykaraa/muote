@@ -7,6 +7,40 @@ use std::path::PathBuf;
 use wikiquote_fetcher::{QuotePool, QuotePoolStore, WikiquoteConfig};
 
 pub const APP_NAME: &str = "marxist_quote";
+const TIMER_UNIT_NAME: &str = "marxist-quote-fetch.timer";
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum QuoteIntervalUnit {
+    Minutes,
+    Hours,
+    Days,
+}
+
+impl QuoteIntervalUnit {
+    pub fn id(self) -> &'static str {
+        match self {
+            Self::Minutes => "minutes",
+            Self::Hours => "hours",
+            Self::Days => "days",
+        }
+    }
+
+    pub fn from_id(id: &str) -> Self {
+        match id {
+            "hours" => Self::Hours,
+            "days" => Self::Days,
+            _ => Self::Minutes,
+        }
+    }
+
+    fn systemd_suffix(self) -> &'static str {
+        match self {
+            Self::Minutes => "min",
+            Self::Hours => "h",
+            Self::Days => "d",
+        }
+    }
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Author {
@@ -91,6 +125,193 @@ pub fn load_settings() -> (DisplayArgs, String) {
 
 pub fn save_settings(data: &DisplayArgs) -> anyhow::Result<String> {
     config_manager().save_settings(data)
+}
+
+pub fn fetch_timer_path() -> PathBuf {
+    if let Ok(path) = std::env::var("MARXIST_QUOTE_TIMER_PATH") {
+        return PathBuf::from(path);
+    }
+
+    let mut candidates = Vec::new();
+    if let Some(config_dir) = dirs::config_dir() {
+        candidates.push(config_dir.join("systemd/user").join(TIMER_UNIT_NAME));
+    }
+    candidates.push(PathBuf::from("/etc/systemd/user").join(TIMER_UNIT_NAME));
+    candidates.push(PathBuf::from("/usr/local/lib/systemd/user").join(TIMER_UNIT_NAME));
+    candidates.push(PathBuf::from("/usr/lib/systemd/user").join(TIMER_UNIT_NAME));
+
+    candidates
+        .iter()
+        .find(|path| path.exists())
+        .cloned()
+        .unwrap_or_else(|| PathBuf::from("/usr/lib/systemd/user").join(TIMER_UNIT_NAME))
+}
+
+pub fn fetch_timer_override_path() -> PathBuf {
+    dirs::config_dir()
+        .unwrap_or_else(|| PathBuf::from("~/.config"))
+        .join(format!("systemd/user/{}.d/override.conf", TIMER_UNIT_NAME))
+}
+
+pub fn remove_fetch_timer_override() -> anyhow::Result<()> {
+    let path = fetch_timer_override_path();
+    match std::fs::remove_file(&path) {
+        Ok(()) => Ok(()),
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(err) => Err(err.into()),
+    }
+}
+
+pub fn load_quote_timer_interval() -> anyhow::Result<(u32, QuoteIntervalUnit)> {
+    let contents = std::fs::read_to_string(fetch_timer_path())?;
+    let mut in_timer_section = false;
+    let mut calendar_interval = None;
+
+    for raw_line in contents.lines() {
+        let line = raw_line.trim();
+        if line.starts_with('[') && line.ends_with(']') {
+            in_timer_section = line == "[Timer]";
+            continue;
+        }
+
+        if !in_timer_section || line.starts_with('#') || line.starts_with(';') {
+            continue;
+        }
+
+        if let Some(value) = line.strip_prefix("OnUnitActiveSec=") {
+            if let Some(interval) = parse_systemd_interval(value.trim()) {
+                return Ok(interval);
+            }
+        }
+
+        if let Some(value) = line.strip_prefix("OnCalendar=") {
+            calendar_interval = parse_calendar_interval(value.trim());
+        }
+    }
+
+    Ok(calendar_interval.unwrap_or((1, QuoteIntervalUnit::Days)))
+}
+
+pub fn apply_quote_timer_interval(value: u32, unit: QuoteIntervalUnit) -> anyhow::Result<()> {
+    let value = value.max(1);
+    let timer_path = fetch_timer_path();
+    let contents = std::fs::read_to_string(&timer_path)?;
+    let mut output = Vec::new();
+    let mut in_timer_section = false;
+    let mut saw_timer_section = false;
+    let mut inserted_interval = false;
+
+    for raw_line in contents.lines() {
+        let line = raw_line.trim();
+        if line.starts_with('[') && line.ends_with(']') {
+            if in_timer_section && !inserted_interval {
+                output.push(format!(
+                    "OnUnitActiveSec={}{}",
+                    value,
+                    unit.systemd_suffix()
+                ));
+                inserted_interval = true;
+            }
+
+            in_timer_section = line == "[Timer]";
+            saw_timer_section |= in_timer_section;
+            output.push(raw_line.to_string());
+            continue;
+        }
+
+        if in_timer_section
+            && (line.starts_with("OnCalendar=") || line.starts_with("OnUnitActiveSec="))
+        {
+            continue;
+        }
+
+        output.push(raw_line.to_string());
+    }
+
+    if saw_timer_section && !inserted_interval {
+        output.push(format!(
+            "OnUnitActiveSec={}{}",
+            value,
+            unit.systemd_suffix()
+        ));
+    } else if !saw_timer_section {
+        if !output.last().map(|line| line.is_empty()).unwrap_or(false) {
+            output.push(String::new());
+        }
+        output.push("[Timer]".to_string());
+        output.push(format!(
+            "OnUnitActiveSec={}{}",
+            value,
+            unit.systemd_suffix()
+        ));
+    }
+
+    write_timer_file(&timer_path, &format!("{}\n", output.join("\n")))?;
+    remove_fetch_timer_override()?;
+    Ok(())
+}
+
+fn write_timer_file(path: &PathBuf, contents: &str) -> anyhow::Result<()> {
+    match std::fs::write(path, contents) {
+        Ok(()) => return Ok(()),
+        Err(err) if err.kind() == std::io::ErrorKind::PermissionDenied => {}
+        Err(err) => return Err(err.into()),
+    }
+
+    let temp_path = std::env::temp_dir().join(format!(
+        "marxist-quote-fetch-{}-{}.timer",
+        std::process::id(),
+        chrono_like_timestamp()
+    ));
+    std::fs::write(&temp_path, contents)?;
+
+    let status = std::process::Command::new("pkexec")
+        .arg("install")
+        .arg("-m")
+        .arg("644")
+        .arg(&temp_path)
+        .arg(path)
+        .status();
+    let _ = std::fs::remove_file(&temp_path);
+
+    match status {
+        Ok(status) if status.success() => Ok(()),
+        Ok(status) => anyhow::bail!("pkexec install exited with {}", status),
+        Err(err) => Err(err.into()),
+    }
+}
+
+fn chrono_like_timestamp() -> u128 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|duration| duration.as_millis())
+        .unwrap_or(0)
+}
+
+fn parse_calendar_interval(value: &str) -> Option<(u32, QuoteIntervalUnit)> {
+    match value {
+        "minutely" => Some((1, QuoteIntervalUnit::Minutes)),
+        "hourly" => Some((1, QuoteIntervalUnit::Hours)),
+        "daily" => Some((1, QuoteIntervalUnit::Days)),
+        _ => None,
+    }
+}
+
+fn parse_systemd_interval(value: &str) -> Option<(u32, QuoteIntervalUnit)> {
+    let value = value.trim();
+    let digits: String = value.chars().take_while(|c| c.is_ascii_digit()).collect();
+    let amount = digits.parse::<u32>().ok()?.max(1);
+    let unit_text = value[digits.len()..].trim();
+
+    match unit_text {
+        "min" | "minute" | "minutes" | "m" => Some((amount, QuoteIntervalUnit::Minutes)),
+        "h" | "hr" | "hour" | "hours" => Some((amount, QuoteIntervalUnit::Hours)),
+        "d" | "day" | "days" => Some((amount, QuoteIntervalUnit::Days)),
+        "" | "s" | "sec" | "second" | "seconds" => {
+            Some((amount.div_ceil(60), QuoteIntervalUnit::Minutes))
+        }
+        _ => None,
+    }
 }
 
 pub fn current_quote_exists() -> bool {
@@ -230,17 +451,19 @@ pub fn fetch_quote() -> anyhow::Result<()> {
 
     let _ = store.save(&pool);
 
-    let display_quote =
-        match wikiquote_fetcher::translate_quote(&chosen_quote, &settings_cfg.appearance.language) {
-            Ok(translated) => translated,
-            Err(err) => {
-                eprintln!(
-                    "Translation failed for language {}: {}",
-                    settings_cfg.appearance.language, err
-                );
-                chosen_quote
-            }
-        };
+    let display_quote = match wikiquote_fetcher::translate_quote(
+        &chosen_quote,
+        &settings_cfg.appearance.language,
+    ) {
+        Ok(translated) => translated,
+        Err(err) => {
+            eprintln!(
+                "Translation failed for language {}: {}",
+                settings_cfg.appearance.language, err
+            );
+            chosen_quote
+        }
+    };
 
     let formatted = format!("\"{}\" — {}", display_quote, selected_author);
     let _ = std::fs::create_dir_all(cache_dir());

@@ -1,13 +1,17 @@
 use crate::app::input::AppInput;
 use adw::prelude::*;
 use marxist_quote_core::config::DisplayArgs;
-use marxist_quote_core::{Author, AuthorsConfig};
+use marxist_quote_core::{Author, AuthorsConfig, QuoteIntervalUnit};
 use relm4::{ComponentSender, gtk};
 
 #[derive(Clone)]
 pub struct AppModel {
     pub authors: AuthorsConfig,
     pub settings: DisplayArgs,
+    pub quote_interval_value: u32,
+    pub quote_interval_unit: QuoteIntervalUnit,
+    pub saved_quote_interval_value: u32,
+    pub saved_quote_interval_unit: QuoteIntervalUnit,
     pub _authors_hash: String,
     pub _settings_hash: String,
 }
@@ -16,10 +20,16 @@ impl AppModel {
     pub fn init_model() -> Self {
         let (authors, authors_hash) = marxist_quote_core::load_authors();
         let (settings, settings_hash) = marxist_quote_core::load_settings();
+        let (quote_interval_value, quote_interval_unit) =
+            marxist_quote_core::load_quote_timer_interval().unwrap_or((1, QuoteIntervalUnit::Days));
 
         AppModel {
             authors,
             settings,
+            quote_interval_value,
+            quote_interval_unit,
+            saved_quote_interval_value: quote_interval_value,
+            saved_quote_interval_unit: quote_interval_unit,
             _authors_hash: authors_hash,
             _settings_hash: settings_hash,
         }

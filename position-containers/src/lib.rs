@@ -21,7 +21,18 @@ pub fn run() -> glib::ExitCode {
     });
 
     app.connect_activate(build_ui);
-    app.run()
+    app.run_with_args(&["marxist-quote-position-picker"])
+}
+
+fn restart_desktop_service() {
+    match std::process::Command::new("systemctl")
+        .args(["--user", "restart", "desktop-quote.service"])
+        .status()
+    {
+        Ok(status) if status.success() => {}
+        Ok(status) => eprintln!("desktop-quote.service restart exited with {}", status),
+        Err(err) => eprintln!("Failed to restart desktop-quote.service: {}", err),
+    }
 }
 
 fn build_ui(app: &Application) {
@@ -242,6 +253,7 @@ fn build_ui(app: &Application) {
 
         // Save
         let _ = marxist_quote_core::save_settings(&s.args);
+        restart_desktop_service();
         println!(
             "Saved. Container {}×{}, max_quote_chars={}",
             s.args.appearance.quote_max_width,

@@ -6,9 +6,10 @@ pub mod widget;
 
 use adw::prelude::*;
 pub use details::{background::bg_details, shadow::shadow_component};
-use marxist_quote_core::config::{HorizontalAlign, VerticalAlign};
 use gtk::Revealer;
 pub use input::AppInput;
+use marxist_quote_core::QuoteIntervalUnit;
+use marxist_quote_core::config::{HorizontalAlign, VerticalAlign};
 pub use model::AppModel;
 use relm4::{Component, ComponentParts, ComponentSender, RelmWidgetExt, adw, gtk};
 pub use static_components::separator;
@@ -33,6 +34,14 @@ fn language_options() -> [(&'static str, &'static str); 11] {
     ]
 }
 
+fn quote_interval_unit_options() -> [(QuoteIntervalUnit, &'static str); 3] {
+    [
+        (QuoteIntervalUnit::Days, "days"),
+        (QuoteIntervalUnit::Hours, "hours"),
+        (QuoteIntervalUnit::Minutes, "minutes"),
+    ]
+}
+
 fn restart_desktop_service() {
     match std::process::Command::new("systemctl")
         .args(["--user", "restart", "desktop-quote.service"])
@@ -41,6 +50,26 @@ fn restart_desktop_service() {
         Ok(status) if status.success() => log::info!("Restarted desktop-quote.service"),
         Ok(status) => log::warn!("desktop-quote.service restart exited with {}", status),
         Err(err) => log::warn!("Failed to restart desktop-quote.service: {}", err),
+    }
+}
+
+fn reload_fetch_timer() {
+    match std::process::Command::new("systemctl")
+        .args(["--user", "daemon-reload"])
+        .status()
+    {
+        Ok(status) if status.success() => log::info!("Reloaded user systemd manager"),
+        Ok(status) => log::warn!("systemctl --user daemon-reload exited with {}", status),
+        Err(err) => log::warn!("Failed to reload user systemd manager: {}", err),
+    }
+
+    match std::process::Command::new("systemctl")
+        .args(["--user", "restart", "marxist-quote-fetch.timer"])
+        .status()
+    {
+        Ok(status) if status.success() => log::info!("Restarted marxist-quote-fetch.timer"),
+        Ok(status) => log::warn!("marxist-quote-fetch.timer restart exited with {}", status),
+        Err(err) => log::warn!("Failed to restart marxist-quote-fetch.timer: {}", err),
     }
 }
 
@@ -333,6 +362,42 @@ impl Component for AppModel {
         language_box.append(&language_combo);
         content.append(&language_box);
 
+        let quote_interval_box = gtk::Box::new(gtk::Orientation::Horizontal, 8);
+        quote_interval_box.append(
+            &gtk::Label::builder()
+                .label("Quote interval")
+                .hexpand(true)
+                .halign(gtk::Align::Start)
+                .build(),
+        );
+        let quote_interval_spin = gtk::SpinButton::with_range(1.0, 9999.0, 1.0);
+        quote_interval_spin.set_digits(0);
+        quote_interval_spin.set_numeric(true);
+        quote_interval_spin.set_width_chars(5);
+        quote_interval_spin.set_value(model.quote_interval_value as f64);
+        quote_interval_spin.set_tooltip_text(Some("Interval for the systemd quote fetch timer."));
+        let s_clone = sender.clone();
+        quote_interval_spin.connect_value_changed(move |spin| {
+            s_clone.input(AppInput::UpdateQuoteIntervalValue(spin.value() as u32));
+        });
+        quote_interval_box.append(&quote_interval_spin);
+
+        let quote_interval_unit_combo = gtk::ComboBoxText::new();
+        for (unit, label) in quote_interval_unit_options() {
+            quote_interval_unit_combo.append(Some(unit.id()), label);
+        }
+        quote_interval_unit_combo.set_active_id(Some(model.quote_interval_unit.id()));
+        let s_clone = sender.clone();
+        quote_interval_unit_combo.connect_changed(move |combo| {
+            if let Some(id) = combo.active_id() {
+                s_clone.input(AppInput::UpdateQuoteIntervalUnit(
+                    QuoteIntervalUnit::from_id(&id),
+                ));
+            }
+        });
+        quote_interval_box.append(&quote_interval_unit_combo);
+        content.append(&quote_interval_box);
+
         content.append(&separator());
 
         content.append(&alignment_section(&model, &sender));
@@ -410,8 +475,9 @@ impl Component for AppModel {
         });
         stroke_color_box.append(&stroke_entry);
         let stroke_color = gtk::ColorButton::new();
-        let (r, g, b, a) =
-            marxist_quote_core::config::parse_color_to_rgba(&model.settings.appearance.stroke_color);
+        let (r, g, b, a) = marxist_quote_core::config::parse_color_to_rgba(
+            &model.settings.appearance.stroke_color,
+        );
         stroke_color.set_rgba(&gtk::gdk::RGBA::new(r as f32, g as f32, b as f32, a as f32));
         let s_clone = sender.clone();
         stroke_color.connect_color_set(move |btn| {
@@ -461,8 +527,9 @@ impl Component for AppModel {
                 .halign(gtk::Align::Start)
                 .build(),
         );
-        let (_, _, _, stroke_alpha) =
-            marxist_quote_core::config::parse_color_to_rgba(&model.settings.appearance.stroke_color);
+        let (_, _, _, stroke_alpha) = marxist_quote_core::config::parse_color_to_rgba(
+            &model.settings.appearance.stroke_color,
+        );
         let stroke_opacity_scale =
             gtk::Scale::with_range(gtk::Orientation::Horizontal, 0.0, 1.0, 0.01);
         stroke_opacity_scale.set_hexpand(true);
@@ -548,6 +615,8 @@ impl Component for AppModel {
         content.append(&author_list);
 
         let widgets = AppWidgets {
+            quote_interval_spin,
+            quote_interval_unit_combo,
             language_combo,
             quote_entry,
             bg_widgets: widget::BgWidgets {
@@ -581,6 +650,8 @@ impl Component for AppModel {
                 }
             }
             AppInput::UpdateFontSize(val) => self.settings.appearance.font_size = val,
+            AppInput::UpdateQuoteIntervalValue(val) => self.quote_interval_value = val.max(1),
+            AppInput::UpdateQuoteIntervalUnit(unit) => self.quote_interval_unit = unit,
             AppInput::UpdateLanguage(val) => self.settings.appearance.language = val,
             AppInput::UpdateTextColor(val) => {
                 if !val.is_empty() && val.starts_with('#') {
@@ -593,9 +664,11 @@ impl Component for AppModel {
                 }
             }
             AppInput::UpdateBgOpacity(a) => {
-                let (r, g, b, _) =
-                    marxist_quote_core::config::parse_color_to_rgba(&self.settings.appearance.bg_color);
-                self.settings.appearance.bg_color = marxist_quote_core::config::rgba_to_hex(r, g, b, a as f64);
+                let (r, g, b, _) = marxist_quote_core::config::parse_color_to_rgba(
+                    &self.settings.appearance.bg_color,
+                );
+                self.settings.appearance.bg_color =
+                    marxist_quote_core::config::rgba_to_hex(r, g, b, a as f64);
             }
             AppInput::UpdateBgEnabled(val) => self.settings.appearance.bg_enabled = val,
             AppInput::UpdateBgRounded(val) => self.settings.appearance.bg_rounded = val,
@@ -606,8 +679,9 @@ impl Component for AppModel {
                 }
             }
             AppInput::UpdateStrokeOpacity(a) => {
-                let (r, g, b, _) =
-                    marxist_quote_core::config::parse_color_to_rgba(&self.settings.appearance.stroke_color);
+                let (r, g, b, _) = marxist_quote_core::config::parse_color_to_rgba(
+                    &self.settings.appearance.stroke_color,
+                );
                 self.settings.appearance.stroke_color =
                     marxist_quote_core::config::rgba_to_hex(r, g, b, a as f64);
             }
@@ -620,8 +694,9 @@ impl Component for AppModel {
             }
             AppInput::UpdateShadowEnabled(val) => self.settings.appearance.shadow_enabled = val,
             AppInput::UpdateShadowOpacity(a) => {
-                let (r, g, b, _) =
-                    marxist_quote_core::config::parse_color_to_rgba(&self.settings.appearance.shadow_color);
+                let (r, g, b, _) = marxist_quote_core::config::parse_color_to_rgba(
+                    &self.settings.appearance.shadow_color,
+                );
                 self.settings.appearance.shadow_color =
                     marxist_quote_core::config::rgba_to_hex(r, g, b, a as f64);
             }
@@ -668,7 +743,30 @@ impl Component for AppModel {
                 self.settings.appearance.position_hash = self.settings.calculate_position_hash();
                 let _ = marxist_quote_core::save_authors(&self.authors);
                 let _ = marxist_quote_core::save_settings(&self.settings);
+                let interval_changed = self.quote_interval_value != self.saved_quote_interval_value
+                    || self.quote_interval_unit != self.saved_quote_interval_unit;
+                let timer_updated = if interval_changed {
+                    match marxist_quote_core::apply_quote_timer_interval(
+                        self.quote_interval_value,
+                        self.quote_interval_unit,
+                    ) {
+                        Ok(()) => {
+                            self.saved_quote_interval_value = self.quote_interval_value;
+                            self.saved_quote_interval_unit = self.quote_interval_unit;
+                            true
+                        }
+                        Err(e) => {
+                            log::error!("Failed to apply fetch timer interval: {}", e);
+                            false
+                        }
+                    }
+                } else {
+                    false
+                };
                 std::thread::spawn(move || {
+                    if timer_updated {
+                        reload_fetch_timer();
+                    }
                     if language_changed || !marxist_quote_core::current_quote_exists() {
                         if let Err(e) = marxist_quote_core::fetch_quote() {
                             log::error!("Error fetching quote after save: {}", e);
@@ -678,9 +776,7 @@ impl Component for AppModel {
                 });
             }
             AppInput::ShowInteractivePicker => {
-                let bin_path = std::env::current_exe()
-                    .ok()
-                    .filter(|path| path.exists());
+                let bin_path = std::env::current_exe().ok().filter(|path| path.exists());
 
                 if let Some(ref path) = bin_path {
                     log::info!("Launching position picker via GUI binary at: {:?}", path);
@@ -691,7 +787,7 @@ impl Component for AppModel {
 
                 let json = serde_json::to_string(&self.settings).unwrap_or_default();
                 match std::process::Command::new(bin_path.unwrap())
-                    .arg("--position-picker")
+                    .env("MARXIST_QUOTE_POSITION_PICKER", "1")
                     .env("MARXIST_QUOTE_PLACE_ARGS", json)
                     .spawn()
                 {
@@ -723,6 +819,18 @@ impl Component for AppModel {
     fn update_view(&self, widgets: &mut Self::Widgets, _sender: ComponentSender<Self>) {
         // --- MANUAL VIEW UPDATE WITH EQUALITY CHECKS ---
         let a = &self.settings.appearance;
+
+        let quote_interval = self.quote_interval_value as f64;
+        if (widgets.quote_interval_spin.value() - quote_interval).abs() > 0.001 {
+            widgets.quote_interval_spin.set_value(quote_interval);
+        }
+        if widgets.quote_interval_unit_combo.active_id().as_deref()
+            != Some(self.quote_interval_unit.id())
+        {
+            widgets
+                .quote_interval_unit_combo
+                .set_active_id(Some(self.quote_interval_unit.id()));
+        }
 
         // Quote Color Entry
         if widgets.quote_entry.text() != a.text_color {
@@ -782,7 +890,8 @@ impl Component for AppModel {
         if (widgets.stroke_width_spin.value() - a.stroke_width as f64).abs() > 0.001 {
             widgets.stroke_width_spin.set_value(a.stroke_width as f64);
         }
-        let (_, _, _, stroke_alpha) = marxist_quote_core::config::parse_color_to_rgba(&a.stroke_color);
+        let (_, _, _, stroke_alpha) =
+            marxist_quote_core::config::parse_color_to_rgba(&a.stroke_color);
         if (widgets.stroke_opacity_scale.value() - stroke_alpha).abs() > 0.001 {
             widgets.stroke_opacity_scale.set_value(stroke_alpha);
         }

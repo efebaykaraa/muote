@@ -21,6 +21,8 @@ pub struct ShadowWidgets {
 }
 
 pub struct AppWidgets {
+    pub quote_interval_spin: gtk::SpinButton,
+    pub quote_interval_unit_combo: gtk::ComboBoxText,
     pub language_combo: gtk::ComboBoxText,
     pub quote_entry: gtk::Entry,
     pub bg_widgets: BgWidgets,

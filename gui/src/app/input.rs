@@ -1,9 +1,12 @@
+use marxist_quote_core::QuoteIntervalUnit;
 use marxist_quote_core::config::{HorizontalAlign, VerticalAlign};
 
 #[derive(Debug)]
 pub enum AppInput {
     UpdateFont(String),
     UpdateFontSize(f32),
+    UpdateQuoteIntervalValue(u32),
+    UpdateQuoteIntervalUnit(QuoteIntervalUnit),
     UpdateLanguage(String),
     UpdateTextColor(String),
     UpdateBgColor(String),

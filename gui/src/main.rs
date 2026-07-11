@@ -6,7 +6,9 @@ use std::fs::File;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    if args.iter().any(|arg| arg == "--position-picker") {
+    if std::env::var_os("MARXIST_QUOTE_POSITION_PICKER").is_some()
+        || args.iter().any(|arg| arg == "--position-picker")
+    {
         let _ = position_containers::run();
         return;
     }

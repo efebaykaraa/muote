@@ -95,7 +95,8 @@ pub fn shadow_details(
         .connect_changed(move |e| s_clone.input(AppInput::UpdateShadowColor(e.text().to_string())));
     shadow_color_box.append(&shadow_entry);
     let shadow_color_btn = gtk::ColorButton::new();
-    let (r, g, b, a) = marxist_quote_core::config::parse_color_to_rgba(&model.settings.appearance.shadow_color);
+    let (r, g, b, a) =
+        marxist_quote_core::config::parse_color_to_rgba(&model.settings.appearance.shadow_color);
     shadow_color_btn.set_rgba(&gtk::gdk::RGBA::new(r as f32, g as f32, b as f32, a as f32));
     let s_clone = sender.clone();
     shadow_color_btn.connect_color_set(move |btn| {
