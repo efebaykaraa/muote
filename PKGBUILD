@@ -1,5 +1,5 @@
 pkgname=marxist-quote
-pkgver=0.2.0
+pkgver=0.2.1
 pkgrel=1
 pkgdesc="Graphical settings UI for Marxist Quote"
 arch=('x86_64')
