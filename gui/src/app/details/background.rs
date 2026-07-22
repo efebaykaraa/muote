@@ -26,13 +26,12 @@ pub fn bg_details(
     bg_color_box.append(&bg_entry);
 
     let bg_color_btn = gtk::ColorButton::new();
-    let (r, g, b, a) =
-        marxist_quote_core::config::parse_color_to_rgba(&model.settings.appearance.bg_color);
+    let (r, g, b, a) = muote_core::config::parse_color_to_rgba(&model.settings.appearance.bg_color);
     bg_color_btn.set_rgba(&gtk::gdk::RGBA::new(r as f32, g as f32, b as f32, a as f32));
     let s_clone = sender.clone();
     bg_color_btn.connect_color_set(move |btn| {
         let rgba = btn.rgba();
-        let hex = marxist_quote_core::config::rgba_to_hex(
+        let hex = muote_core::config::rgba_to_hex(
             rgba.red() as f64,
             rgba.green() as f64,
             rgba.blue() as f64,
@@ -72,7 +71,7 @@ pub fn bg_details(
     let bg_scale = gtk::Scale::with_range(gtk::Orientation::Horizontal, 0.0, 1.0, 0.01);
     bg_scale.set_hexpand(true);
     let (_, _, _, ba) =
-        marxist_quote_core::config::parse_color_to_rgba(&model.settings.appearance.bg_color);
+        muote_core::config::parse_color_to_rgba(&model.settings.appearance.bg_color);
     bg_scale.set_value(ba);
     let s_clone = sender.clone();
     bg_scale

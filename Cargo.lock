@@ -1268,55 +1268,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "marxist-quote-background"
-version = "0.2.0"
-dependencies = [
- "anyhow",
- "cairo-rs 0.18.5",
- "dirs",
- "gtk",
- "marxist-quote-core",
- "pango 0.18.3",
- "pangocairo 0.18.0",
- "serde",
- "serde_json",
- "sha1",
-]
-
-[[package]]
-name = "marxist-quote-core"
-version = "0.2.0"
-dependencies = [
- "anyhow",
- "dirs",
- "rand 0.9.4",
- "serde",
- "serde_json",
- "sha1",
- "wikiquote-fetcher",
-]
-
-[[package]]
-name = "marxist-quote-gui"
-version = "0.2.0"
-dependencies = [
- "anyhow",
- "dirs",
- "gtk4",
- "libadwaita",
- "log",
- "marxist-quote-core",
- "position-containers",
- "relm4",
- "serde",
- "serde_json",
- "sha1",
- "simplelog",
- "toml 0.8.2",
- "wikiquote-fetcher",
-]
-
-[[package]]
 name = "match_token"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1350,6 +1301,55 @@ checksum = "1fa76a2c86f704bdb222d66965fb3d63269ce38518b83cb0575fca855ebb6316"
 dependencies = [
  "adler2",
  "simd-adler32",
+]
+
+[[package]]
+name = "muote-background"
+version = "0.3.0"
+dependencies = [
+ "anyhow",
+ "cairo-rs 0.18.5",
+ "dirs",
+ "gtk",
+ "muote-core",
+ "pango 0.18.3",
+ "pangocairo 0.18.0",
+ "serde",
+ "serde_json",
+ "sha1",
+]
+
+[[package]]
+name = "muote-core"
+version = "0.3.0"
+dependencies = [
+ "anyhow",
+ "dirs",
+ "rand 0.9.4",
+ "serde",
+ "serde_json",
+ "sha1",
+ "wikiquote-fetcher",
+]
+
+[[package]]
+name = "muote-gui"
+version = "0.3.0"
+dependencies = [
+ "anyhow",
+ "dirs",
+ "gtk4",
+ "libadwaita",
+ "log",
+ "muote-core",
+ "position-containers",
+ "relm4",
+ "serde",
+ "serde_json",
+ "sha1",
+ "simplelog",
+ "toml 0.8.2",
+ "wikiquote-fetcher",
 ]
 
 [[package]]
@@ -1590,14 +1590,14 @@ checksum = "19f132c84eca552bf34cab8ec81f1c1dcc229b811638f9d283dceabe58c5569e"
 
 [[package]]
 name = "position-containers"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "anyhow",
  "cairo-rs 0.20.12",
  "dirs",
  "gtk4",
  "libadwaita",
- "marxist-quote-core",
+ "muote-core",
  "pango 0.20.12",
  "pangocairo 0.20.10",
  "serde",

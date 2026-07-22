@@ -1,7 +1,7 @@
 use crate::app::input::AppInput;
 use adw::prelude::*;
-use marxist_quote_core::config::DisplayArgs;
-use marxist_quote_core::{Author, AuthorsConfig, QuoteIntervalUnit};
+use muote_core::config::DisplayArgs;
+use muote_core::{Author, AuthorsConfig, QuoteIntervalUnit};
 use relm4::{ComponentSender, gtk};
 
 #[derive(Clone)]
@@ -18,10 +18,10 @@ pub struct AppModel {
 
 impl AppModel {
     pub fn init_model() -> Self {
-        let (authors, authors_hash) = marxist_quote_core::load_authors();
-        let (settings, settings_hash) = marxist_quote_core::load_settings();
+        let (authors, authors_hash) = muote_core::load_authors();
+        let (settings, settings_hash) = muote_core::load_settings();
         let (quote_interval_value, quote_interval_unit) =
-            marxist_quote_core::load_quote_timer_interval().unwrap_or((1, QuoteIntervalUnit::Days));
+            muote_core::load_quote_timer_interval().unwrap_or((1, QuoteIntervalUnit::Days));
 
         AppModel {
             authors,

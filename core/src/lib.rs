@@ -6,8 +6,8 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use wikiquote_fetcher::{QuotePool, QuotePoolStore, WikiquoteConfig};
 
-pub const APP_NAME: &str = "marxist_quote";
-const TIMER_UNIT_NAME: &str = "marxist-quote-fetch.timer";
+pub const APP_NAME: &str = "muote";
+const TIMER_UNIT_NAME: &str = "muote-fetch.timer";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum QuoteIntervalUnit {
@@ -128,7 +128,7 @@ pub fn save_settings(data: &DisplayArgs) -> anyhow::Result<String> {
 }
 
 pub fn fetch_timer_path() -> PathBuf {
-    if let Ok(path) = std::env::var("MARXIST_QUOTE_TIMER_PATH") {
+    if let Ok(path) = std::env::var("MUOTE_TIMER_PATH") {
         return PathBuf::from(path);
     }
 
@@ -259,7 +259,7 @@ fn write_timer_file(path: &PathBuf, contents: &str) -> anyhow::Result<()> {
     }
 
     let temp_path = std::env::temp_dir().join(format!(
-        "marxist-quote-fetch-{}-{}.timer",
+        "muote-fetch-{}-{}.timer",
         std::process::id(),
         chrono_like_timestamp()
     ));
@@ -417,7 +417,7 @@ pub fn fetch_quote() -> anyhow::Result<()> {
         pool.quotes = wikiquote_fetcher::fetch_wikiquote_with_config(
             selected_author,
             &WikiquoteConfig {
-                user_agent: "MarxistQuote/0.1.6".into(),
+                user_agent: "Muote/0.2.0".into(),
                 ..WikiquoteConfig::default()
             },
         )?;

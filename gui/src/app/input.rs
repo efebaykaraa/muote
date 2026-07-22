@@ -1,5 +1,5 @@
-use marxist_quote_core::QuoteIntervalUnit;
-use marxist_quote_core::config::{HorizontalAlign, VerticalAlign};
+use muote_core::QuoteIntervalUnit;
+use muote_core::config::{HorizontalAlign, VerticalAlign};
 
 #[derive(Debug)]
 pub enum AppInput {

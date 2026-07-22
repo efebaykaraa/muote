@@ -1,6 +1,6 @@
 [package]
-name = "marxist-quote-gui"
-version = "0.2.0"
+name = "muote-gui"
+version = "0.3.0"
 edition = "2024"
 license = "GPL-3.0-or-later"
 
@@ -14,7 +14,7 @@ toml = "0.8"
 dirs = "6.0"
 anyhow = "1.0"
 sha1 = "0.10"
-marxist-quote-core = { path = "../core" }
+muote-core = { path = "../core" }
 position-containers = { path = "../position-containers" }
 wikiquote-fetcher = { path = "../../wikiquote-fetcher" }
 simplelog = "0.12.2"

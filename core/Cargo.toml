@@ -1,11 +1,11 @@
 [package]
-name = "marxist-quote-core"
-version = "0.2.0"
+name = "muote-core"
+version = "0.3.0"
 edition = "2024"
 license = "GPL-3.0-or-later"
 
 [lib]
-name = "marxist_quote_core"
+name = "muote_core"
 path = "src/lib.rs"
 
 [dependencies]

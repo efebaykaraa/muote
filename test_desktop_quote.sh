@@ -13,8 +13,8 @@ NC='\033[0m' # No Color
 echo -e "${BLUE}=== Desktop Quote Test Script ===${NC}\n"
 
 # Get the config directory
-CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/marxist-quote"
-CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/marxist-quote"
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/muote"
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/muote"
 
 echo -e "${YELLOW}Creating test directories...${NC}"
 mkdir -p "$CONFIG_DIR"

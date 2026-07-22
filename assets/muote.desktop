@@ -1,9 +1,9 @@
 [Desktop Entry]
 Type=Application
-Name=Marxist Quote
+Name=Muote
 Comment=Configure the desktop quote overlay
-Exec=marxist-quote-gui
-Icon=marxist-quote
+Exec=muote-gui
+Icon=muote
 Terminal=false
 Categories=GTK;Utility;Settings;
 StartupNotify=true

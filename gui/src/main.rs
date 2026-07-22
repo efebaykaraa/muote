@@ -6,15 +6,15 @@ use std::fs::File;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    if std::env::var_os("MARXIST_QUOTE_POSITION_PICKER").is_some()
+    if std::env::var_os("MUOTE_POSITION_PICKER").is_some()
         || args.iter().any(|arg| arg == "--position-picker")
     {
         let _ = position_containers::run();
         return;
     }
 
-    let log_path = marxist_quote_core::config_dir().join("gui.log");
-    let _ = std::fs::create_dir_all(marxist_quote_core::config_dir());
+    let log_path = muote_core::config_dir().join("gui.log");
+    let _ = std::fs::create_dir_all(muote_core::config_dir());
 
     let _ = CombinedLogger::init(vec![
         TermLogger::new(
@@ -30,8 +30,8 @@ fn main() {
         ),
     ]);
 
-    log::info!("Starting Marxist Quote GUI...");
+    log::info!("Starting Muote GUI...");
 
-    let app = relm4::RelmApp::new("com.github.marxist_quote");
+    let app = relm4::RelmApp::new("com.github.muote");
     app.run::<app::AppModel>(());
 }

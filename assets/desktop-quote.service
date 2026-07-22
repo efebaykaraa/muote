@@ -5,7 +5,7 @@ PartOf=graphical-session.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/marxist-quote-background
+ExecStart=/usr/bin/muote-background
 Restart=on-failure
 RestartSec=3
 

@@ -1,6 +1,6 @@
 [package]
-name = "marxist-quote-background"
-version = "0.2.0"
+name = "muote-background"
+version = "0.3.0"
 edition = "2024"
 license = "GPL-3.0-or-later"
 
@@ -9,7 +9,7 @@ gtk = "0.18"
 cairo-rs = "0.18"
 pango = "0.18"
 pangocairo = "0.18"
-marxist-quote-core = { path = "../core" }
+muote-core = { path = "../core" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 dirs = "6.0"

@@ -13,7 +13,7 @@ use state::State;
 
 pub fn run() -> glib::ExitCode {
     let app = Application::builder()
-        .application_id("com.github.marxist_quote.Place")
+        .application_id("com.github.muote.Place")
         .build();
 
     app.connect_startup(|_| {
@@ -21,7 +21,7 @@ pub fn run() -> glib::ExitCode {
     });
 
     app.connect_activate(build_ui);
-    app.run_with_args(&["marxist-quote-position-picker"])
+    app.run_with_args(&["muote-position-picker"])
 }
 
 fn restart_desktop_service() {
@@ -37,18 +37,18 @@ fn restart_desktop_service() {
 
 fn build_ui(app: &Application) {
     let args_os: Vec<String> = std::env::args().collect();
-    let args = if let Ok(json) = std::env::var("MARXIST_QUOTE_PLACE_ARGS") {
-        match serde_json::from_str::<marxist_quote_core::config::DisplayArgs>(&json) {
+    let args = if let Ok(json) = std::env::var("MUOTE_PLACE_ARGS") {
+        match serde_json::from_str::<muote_core::config::DisplayArgs>(&json) {
             Ok(a) => a,
-            Err(_) => marxist_quote_core::load_settings().0,
+            Err(_) => muote_core::load_settings().0,
         }
     } else if args_os.len() > 1 {
-        match serde_json::from_str::<marxist_quote_core::config::DisplayArgs>(&args_os[1]) {
+        match serde_json::from_str::<muote_core::config::DisplayArgs>(&args_os[1]) {
             Ok(a) => a,
-            Err(_) => marxist_quote_core::load_settings().0,
+            Err(_) => muote_core::load_settings().0,
         }
     } else {
-        marxist_quote_core::load_settings().0
+        muote_core::load_settings().0
     };
 
     let (sw, sh) = if let Some(display) = gtk::gdk::Display::default() {
@@ -252,7 +252,7 @@ fn build_ui(app: &Application) {
         s.args.appearance.position_hash = s.args.calculate_position_hash();
 
         // Save
-        let _ = marxist_quote_core::save_settings(&s.args);
+        let _ = muote_core::save_settings(&s.args);
         restart_desktop_service();
         println!(
             "Saved. Container {}×{}, max_quote_chars={}",

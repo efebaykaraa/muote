@@ -96,12 +96,12 @@ pub fn shadow_details(
     shadow_color_box.append(&shadow_entry);
     let shadow_color_btn = gtk::ColorButton::new();
     let (r, g, b, a) =
-        marxist_quote_core::config::parse_color_to_rgba(&model.settings.appearance.shadow_color);
+        muote_core::config::parse_color_to_rgba(&model.settings.appearance.shadow_color);
     shadow_color_btn.set_rgba(&gtk::gdk::RGBA::new(r as f32, g as f32, b as f32, a as f32));
     let s_clone = sender.clone();
     shadow_color_btn.connect_color_set(move |btn| {
         let rgba = btn.rgba();
-        let hex = marxist_quote_core::config::rgba_to_hex(
+        let hex = muote_core::config::rgba_to_hex(
             rgba.red() as f64,
             rgba.green() as f64,
             rgba.blue() as f64,
@@ -149,7 +149,7 @@ pub fn shadow_details(
     let shadow_opacity = gtk::Scale::with_range(gtk::Orientation::Horizontal, 0.0, 1.0, 0.01);
     shadow_opacity.set_hexpand(true);
     let (_, _, _, alpha) =
-        marxist_quote_core::config::parse_color_to_rgba(&model.settings.appearance.shadow_color);
+        muote_core::config::parse_color_to_rgba(&model.settings.appearance.shadow_color);
     shadow_opacity.set_value(alpha);
     let s_clone = sender.clone();
     shadow_opacity.connect_value_changed(move |s| {

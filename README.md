@@ -1,34 +1,34 @@
-# Marxist Quote
+# Muote
 
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/9938e8cf-a750-406f-a19f-3bc29a497e79" />
 
-Marxist Quote is the GTK/libadwaita settings UI for the Marxist Quote desktop quote system. It owns its application settings, author weights, and desktop display behavior, and uses `wikiquote-fetcher` for reusable quote fetching.
+Muote is the GTK/libadwaita settings UI for the Muote desktop quote system. It owns its application settings, author weights, and desktop display behavior, and uses `wikiquote-fetcher` for reusable quote fetching.
 
 ## AUR
 
 > [!TIP]
-> **marxist-quote** is available on the Arch User Repository: [`marxist-quote`](https://aur.archlinux.org/packages/marxist-quote)
+> **muote** is available on the Arch User Repository: [`muote`](https://aur.archlinux.org/packages/muote)
 >
 > ```sh
-> yay -S marxist-quote
+> yay -S muote
 > ```
 
 The Arch package installs two application binaries:
 
-- `marxist-quote-gui`: graphical settings UI
-- `marxist-quote-background`: desktop quote display, plus `--fetch` for quote refreshes
+- `muote-gui`: graphical settings UI
+- `muote-background`: desktop quote display, plus `--fetch` for quote refreshes
 
 ## How It Fits Together
 
-At runtime, Marxist Quote provides the user-facing settings UI and a user service for the desktop overlay. The background binary uses the reusable `wikiquote-fetcher` library at build time for quote fetching.
+At runtime, Muote provides the user-facing settings UI and a user service for the desktop overlay. The background binary uses the reusable `wikiquote-fetcher` library at build time for quote fetching.
 
 ```text
 User session
   |
-  +-- marxist_quote
+  +-- muote
   |     edits settings
   |
-  +-- marxist-quote-background
+  +-- muote-background
         displays and refreshes quotes
 ```
 
@@ -50,15 +50,15 @@ makepkg -si
 
 The `PKGBUILD` installs:
 
-- `/usr/bin/marxist_quote`
-- `/usr/bin/marxist-quote-gui`
-- `/usr/bin/marxist-quote-background`
-- `/usr/share/applications/marxist_quote.desktop`
+- `/usr/bin/muote`
+- `/usr/bin/muote-gui`
+- `/usr/bin/muote-background`
+- `/usr/share/applications/muote.desktop`
 - `/usr/lib/systemd/user/desktop-quote.service`
-- `/usr/lib/systemd/user/marxist-quote-fetch.service`
-- `/usr/lib/systemd/user/marxist-quote-fetch.timer`
-- `/usr/share/icons/hicolor/.../apps/marxist-quote.png`
-- `/usr/share/licenses/marxist-quote/LICENSE`
+- `/usr/lib/systemd/user/muote-fetch.service`
+- `/usr/lib/systemd/user/muote-fetch.timer`
+- `/usr/share/icons/hicolor/.../apps/muote.png`
+- `/usr/share/licenses/muote/LICENSE`
 
 ## Repository Layout
 

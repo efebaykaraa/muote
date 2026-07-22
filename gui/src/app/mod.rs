@@ -8,9 +8,9 @@ use adw::prelude::*;
 pub use details::{background::bg_details, shadow::shadow_component};
 use gtk::Revealer;
 pub use input::AppInput;
-use marxist_quote_core::QuoteIntervalUnit;
-use marxist_quote_core::config::{HorizontalAlign, VerticalAlign};
 pub use model::AppModel;
+use muote_core::QuoteIntervalUnit;
+use muote_core::config::{HorizontalAlign, VerticalAlign};
 use relm4::{Component, ComponentParts, ComponentSender, RelmWidgetExt, adw, gtk};
 pub use static_components::separator;
 
@@ -64,12 +64,12 @@ fn reload_fetch_timer() {
     }
 
     match std::process::Command::new("systemctl")
-        .args(["--user", "restart", "marxist-quote-fetch.timer"])
+        .args(["--user", "restart", "muote-fetch.timer"])
         .status()
     {
-        Ok(status) if status.success() => log::info!("Restarted marxist-quote-fetch.timer"),
-        Ok(status) => log::warn!("marxist-quote-fetch.timer restart exited with {}", status),
-        Err(err) => log::warn!("Failed to restart marxist-quote-fetch.timer: {}", err),
+        Ok(status) if status.success() => log::info!("Restarted muote-fetch.timer"),
+        Ok(status) => log::warn!("muote-fetch.timer restart exited with {}", status),
+        Err(err) => log::warn!("Failed to restart muote-fetch.timer: {}", err),
     }
 }
 
@@ -243,7 +243,7 @@ impl Component for AppModel {
         let root = adw::Window::builder()
             .default_width(630)
             .default_height(850)
-            .title("Marxist Quote Display - Settings")
+            .title("Muote Display - Settings")
             .build();
         root.set_size_request(MIN_WINDOW_WIDTH, -1);
         root
@@ -330,12 +330,12 @@ impl Component for AppModel {
 
         let quote_color = gtk::ColorButton::new();
         let (r, g, b, a) =
-            marxist_quote_core::config::parse_color_to_rgba(&model.settings.appearance.text_color);
+            muote_core::config::parse_color_to_rgba(&model.settings.appearance.text_color);
         quote_color.set_rgba(&gtk::gdk::RGBA::new(r as f32, g as f32, b as f32, a as f32));
         let s_clone = sender.clone();
         quote_color.connect_color_set(move |btn| {
             let rgba = btn.rgba();
-            let hex = marxist_quote_core::config::rgba_to_hex(
+            let hex = muote_core::config::rgba_to_hex(
                 rgba.red() as f64,
                 rgba.green() as f64,
                 rgba.blue() as f64,
@@ -475,14 +475,13 @@ impl Component for AppModel {
         });
         stroke_color_box.append(&stroke_entry);
         let stroke_color = gtk::ColorButton::new();
-        let (r, g, b, a) = marxist_quote_core::config::parse_color_to_rgba(
-            &model.settings.appearance.stroke_color,
-        );
+        let (r, g, b, a) =
+            muote_core::config::parse_color_to_rgba(&model.settings.appearance.stroke_color);
         stroke_color.set_rgba(&gtk::gdk::RGBA::new(r as f32, g as f32, b as f32, a as f32));
         let s_clone = sender.clone();
         stroke_color.connect_color_set(move |btn| {
             let rgba = btn.rgba();
-            let hex = marxist_quote_core::config::rgba_to_hex(
+            let hex = muote_core::config::rgba_to_hex(
                 rgba.red() as f64,
                 rgba.green() as f64,
                 rgba.blue() as f64,
@@ -527,9 +526,8 @@ impl Component for AppModel {
                 .halign(gtk::Align::Start)
                 .build(),
         );
-        let (_, _, _, stroke_alpha) = marxist_quote_core::config::parse_color_to_rgba(
-            &model.settings.appearance.stroke_color,
-        );
+        let (_, _, _, stroke_alpha) =
+            muote_core::config::parse_color_to_rgba(&model.settings.appearance.stroke_color);
         let stroke_opacity_scale =
             gtk::Scale::with_range(gtk::Orientation::Horizontal, 0.0, 1.0, 0.01);
         stroke_opacity_scale.set_hexpand(true);
@@ -664,11 +662,10 @@ impl Component for AppModel {
                 }
             }
             AppInput::UpdateBgOpacity(a) => {
-                let (r, g, b, _) = marxist_quote_core::config::parse_color_to_rgba(
-                    &self.settings.appearance.bg_color,
-                );
+                let (r, g, b, _) =
+                    muote_core::config::parse_color_to_rgba(&self.settings.appearance.bg_color);
                 self.settings.appearance.bg_color =
-                    marxist_quote_core::config::rgba_to_hex(r, g, b, a as f64);
+                    muote_core::config::rgba_to_hex(r, g, b, a as f64);
             }
             AppInput::UpdateBgEnabled(val) => self.settings.appearance.bg_enabled = val,
             AppInput::UpdateBgRounded(val) => self.settings.appearance.bg_rounded = val,
@@ -679,11 +676,10 @@ impl Component for AppModel {
                 }
             }
             AppInput::UpdateStrokeOpacity(a) => {
-                let (r, g, b, _) = marxist_quote_core::config::parse_color_to_rgba(
-                    &self.settings.appearance.stroke_color,
-                );
+                let (r, g, b, _) =
+                    muote_core::config::parse_color_to_rgba(&self.settings.appearance.stroke_color);
                 self.settings.appearance.stroke_color =
-                    marxist_quote_core::config::rgba_to_hex(r, g, b, a as f64);
+                    muote_core::config::rgba_to_hex(r, g, b, a as f64);
             }
             AppInput::UpdateStrokeEnabled(val) => self.settings.appearance.stroke_enabled = val,
             AppInput::UpdateStrokeWidth(val) => self.settings.appearance.stroke_width = val,
@@ -694,11 +690,10 @@ impl Component for AppModel {
             }
             AppInput::UpdateShadowEnabled(val) => self.settings.appearance.shadow_enabled = val,
             AppInput::UpdateShadowOpacity(a) => {
-                let (r, g, b, _) = marxist_quote_core::config::parse_color_to_rgba(
-                    &self.settings.appearance.shadow_color,
-                );
+                let (r, g, b, _) =
+                    muote_core::config::parse_color_to_rgba(&self.settings.appearance.shadow_color);
                 self.settings.appearance.shadow_color =
-                    marxist_quote_core::config::rgba_to_hex(r, g, b, a as f64);
+                    muote_core::config::rgba_to_hex(r, g, b, a as f64);
             }
             AppInput::UpdateShadowOffset(val) => self.settings.appearance.shadow_offset = val,
             AppInput::UpdateShadowBlur(val) => self.settings.appearance.shadow_blur = val,
@@ -724,10 +719,10 @@ impl Component for AppModel {
             }
             AppInput::DismissAuthorNote => {
                 self.authors.show_weight_note = false;
-                let _ = marxist_quote_core::save_authors(&self.authors);
+                let _ = muote_core::save_authors(&self.authors);
             }
             AppInput::Save => {
-                let (saved_settings, _) = marxist_quote_core::load_settings();
+                let (saved_settings, _) = muote_core::load_settings();
                 let language_changed =
                     saved_settings.appearance.language != self.settings.appearance.language;
                 self.settings.appearance.quote_x = saved_settings.appearance.quote_x;
@@ -741,12 +736,12 @@ impl Component for AppModel {
                 self.settings.appearance.max_quote_chars =
                     saved_settings.appearance.max_quote_chars;
                 self.settings.appearance.position_hash = self.settings.calculate_position_hash();
-                let _ = marxist_quote_core::save_authors(&self.authors);
-                let _ = marxist_quote_core::save_settings(&self.settings);
+                let _ = muote_core::save_authors(&self.authors);
+                let _ = muote_core::save_settings(&self.settings);
                 let interval_changed = self.quote_interval_value != self.saved_quote_interval_value
                     || self.quote_interval_unit != self.saved_quote_interval_unit;
                 let timer_updated = if interval_changed {
-                    match marxist_quote_core::apply_quote_timer_interval(
+                    match muote_core::apply_quote_timer_interval(
                         self.quote_interval_value,
                         self.quote_interval_unit,
                     ) {
@@ -767,8 +762,8 @@ impl Component for AppModel {
                     if timer_updated {
                         reload_fetch_timer();
                     }
-                    if language_changed || !marxist_quote_core::current_quote_exists() {
-                        if let Err(e) = marxist_quote_core::fetch_quote() {
+                    if language_changed || !muote_core::current_quote_exists() {
+                        if let Err(e) = muote_core::fetch_quote() {
                             log::error!("Error fetching quote after save: {}", e);
                         }
                     }
@@ -787,8 +782,8 @@ impl Component for AppModel {
 
                 let json = serde_json::to_string(&self.settings).unwrap_or_default();
                 match std::process::Command::new(bin_path.unwrap())
-                    .env("MARXIST_QUOTE_POSITION_PICKER", "1")
-                    .env("MARXIST_QUOTE_PLACE_ARGS", json)
+                    .env("MUOTE_POSITION_PICKER", "1")
+                    .env("MUOTE_PLACE_ARGS", json)
                     .spawn()
                 {
                     Ok(child) => log::info!("position-containers spawned with PID {}", child.id()),
@@ -797,7 +792,7 @@ impl Component for AppModel {
             }
             AppInput::FetchQuoteNow => {
                 std::thread::spawn(|| {
-                    if let Err(e) = marxist_quote_core::fetch_quote() {
+                    if let Err(e) = muote_core::fetch_quote() {
                         log::error!("Error: {}", e);
                     } else {
                         restart_desktop_service();
@@ -806,7 +801,7 @@ impl Component for AppModel {
             }
             AppInput::SkipQuote => {
                 std::thread::spawn(|| {
-                    if let Err(e) = marxist_quote_core::fetch_quote() {
+                    if let Err(e) = muote_core::fetch_quote() {
                         log::error!("Error skipping quote: {}", e);
                     } else {
                         restart_desktop_service();
@@ -868,7 +863,7 @@ impl Component for AppModel {
         }
 
         // Opacity widgets
-        let (_, _, _, ba) = marxist_quote_core::config::parse_color_to_rgba(&a.bg_color);
+        let (_, _, _, ba) = muote_core::config::parse_color_to_rgba(&a.bg_color);
         if (widgets.bg_widgets.bg_scale.value() - ba).abs() > 0.001 {
             widgets.bg_widgets.bg_scale.set_value(ba);
         }
@@ -890,8 +885,7 @@ impl Component for AppModel {
         if (widgets.stroke_width_spin.value() - a.stroke_width as f64).abs() > 0.001 {
             widgets.stroke_width_spin.set_value(a.stroke_width as f64);
         }
-        let (_, _, _, stroke_alpha) =
-            marxist_quote_core::config::parse_color_to_rgba(&a.stroke_color);
+        let (_, _, _, stroke_alpha) = muote_core::config::parse_color_to_rgba(&a.stroke_color);
         if (widgets.stroke_opacity_scale.value() - stroke_alpha).abs() > 0.001 {
             widgets.stroke_opacity_scale.set_value(stroke_alpha);
         }
@@ -926,7 +920,7 @@ impl Component for AppModel {
                 .shadow_spin
                 .set_value(a.shadow_offset as f64);
         }
-        let (_, _, _, sa) = marxist_quote_core::config::parse_color_to_rgba(&a.shadow_color);
+        let (_, _, _, sa) = muote_core::config::parse_color_to_rgba(&a.shadow_color);
         if (widgets.shadow_widgets.shadow_opacity_scale.value() - sa).abs() > 0.001 {
             widgets.shadow_widgets.shadow_opacity_scale.set_value(sa);
         }

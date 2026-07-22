@@ -5,5 +5,5 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/marxist-quote-background --fetch
+ExecStart=/usr/bin/muote-background --fetch
 ExecStartPost=/usr/bin/systemctl --user restart desktop-quote.service

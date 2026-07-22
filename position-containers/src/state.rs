@@ -1,7 +1,7 @@
 use crate::events::{DragMode, HoverTarget};
 
 pub struct State {
-    pub args: marxist_quote_core::config::DisplayArgs,
+    pub args: muote_core::config::DisplayArgs,
     pub hover: HoverTarget,
     pub drag_mode: DragMode,
     pub drag_start_val_x: i32,

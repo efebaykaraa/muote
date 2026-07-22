@@ -1,12 +1,12 @@
 use crate::draw::draw_quote;
 use gtk::prelude::*;
-use marxist_quote_core::config::DisplayArgs;
+use muote_core::config::DisplayArgs;
 
 pub fn run_display(args: DisplayArgs, quote_text: &str, author_text: &str) {
     crate::desktop::force_x11_backend();
     crate::desktop::init_gtk();
 
-    let window = crate::desktop::build_desktop_window("Marxist Quote");
+    let window = crate::desktop::build_desktop_window("Muote");
     crate::desktop::enable_transparency(&window);
 
     let (window_x, window_y, window_width, window_height) =

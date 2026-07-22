@@ -1,6 +1,6 @@
 use crate::events::HoverTarget;
 use crate::state::{PREVIEW_AUTHOR, State};
-use marxist_quote_core::config::{HorizontalAlign, VerticalAlign, parse_color_to_rgba};
+use muote_core::config::{HorizontalAlign, VerticalAlign, parse_color_to_rgba};
 use pango::FontDescription;
 use pangocairo::functions as pc;
 

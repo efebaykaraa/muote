@@ -1,9 +1,9 @@
-pkgname=marxist-quote
-pkgver=0.2.1
+pkgname=muote
+pkgver=0.3.0
 pkgrel=1
-pkgdesc="Graphical settings UI for Marxist Quote"
+pkgdesc="Graphical settings UI for Muote"
 arch=('x86_64')
-url="https://github.com/efebaykaraa/marxist-quote"
+url="https://github.com/efebaykaraa/muote"
 license=('GPL-3.0-or-later')
 depends=(
   'gtk3'
@@ -16,7 +16,7 @@ depends=(
 )
 makedepends=('cargo')
 optdepends=('desktop-file-utils: update desktop entry cache during install hooks')
-install=marxist-quote.install
+install=muote.install
 options=('!lto')
 source=()
 sha256sums=()
@@ -37,44 +37,44 @@ build() {
 package() {
   cd "$startdir"
 
-  install -Dm755 target/release/marxist-quote-gui "$pkgdir/usr/bin/marxist-quote-gui"
-  install -Dm755 target/release/marxist-quote-background "$pkgdir/usr/bin/marxist-quote-background"
-  ln -s marxist-quote-gui "$pkgdir/usr/bin/marxist_quote"
+  install -Dm755 target/release/muote-gui "$pkgdir/usr/bin/muote-gui"
+  install -Dm755 target/release/muote-background "$pkgdir/usr/bin/muote-background"
+  ln -s muote-gui "$pkgdir/usr/bin/muote"
 
-  install -Dm644 assets/marxist_quote.desktop \
-    "$pkgdir/usr/share/applications/marxist_quote.desktop"
+  install -Dm644 assets/muote.desktop \
+    "$pkgdir/usr/share/applications/muote.desktop"
   install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 
   for size in 16 24 32 48 64 128 256; do
     for icon in \
-      "assets/icons/hicolor/${size}x${size}/apps/marxist-quote.png" \
-      "assets/icons/hicolor/${size}x${size}/apps/marxist_quote_${size}.png" \
-      "assets/icons/hicolor/${size}x${size}/marxist-quote.png" \
-      "assets/icons/hicolor/${size}x${size}/marxist_quote_${size}.png"; do
+      "assets/icons/hicolor/${size}x${size}/apps/muote.png" \
+      "assets/icons/hicolor/${size}x${size}/apps/muote_${size}.png" \
+      "assets/icons/hicolor/${size}x${size}/muote.png" \
+      "assets/icons/hicolor/${size}x${size}/muote_${size}.png"; do
       if [ -f "$icon" ]; then
         install -Dm644 "$icon" \
-          "$pkgdir/usr/share/icons/hicolor/${size}x${size}/apps/marxist-quote.png"
+          "$pkgdir/usr/share/icons/hicolor/${size}x${size}/apps/muote.png"
         break
       fi
     done
   done
 
   for icon in \
-    assets/icons/hicolor/scalable/apps/marxist-quote.svg \
-    assets/icons/hicolor/scalable/apps/marxist_quote.svg \
-    assets/icons/hicolor/scalable/marxist-quote.svg \
-    assets/icons/hicolor/scalable/marxist_quote.svg; do
+    assets/icons/hicolor/scalable/apps/muote.svg \
+    assets/icons/hicolor/scalable/apps/muote.svg \
+    assets/icons/hicolor/scalable/muote.svg \
+    assets/icons/hicolor/scalable/muote.svg; do
     if [ -f "$icon" ]; then
       install -Dm644 "$icon" \
-        "$pkgdir/usr/share/icons/hicolor/scalable/apps/marxist-quote.svg"
+        "$pkgdir/usr/share/icons/hicolor/scalable/apps/muote.svg"
       break
     fi
   done
 
   install -Dm644 assets/desktop-quote.service \
     "$pkgdir/usr/lib/systemd/user/desktop-quote.service"
-  install -Dm644 assets/marxist-quote-fetch.service \
-    "$pkgdir/usr/lib/systemd/user/marxist-quote-fetch.service"
-  install -Dm644 assets/marxist-quote-fetch.timer \
-    "$pkgdir/usr/lib/systemd/user/marxist-quote-fetch.timer"
+  install -Dm644 assets/muote-fetch.service \
+    "$pkgdir/usr/lib/systemd/user/muote-fetch.service"
+  install -Dm644 assets/muote-fetch.timer \
+    "$pkgdir/usr/lib/systemd/user/muote-fetch.timer"
 }
